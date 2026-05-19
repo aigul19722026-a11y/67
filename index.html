@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ОКП: Отдел Контроля Подражателей - HARDCORE VHS</title>
+    <title>ОКП: Отдел Контроля Подражателей - ANIMATION UPDATE</title>
     <style>
         body {
             background-color: #020202;
@@ -95,7 +95,7 @@
             background-color: #020402;
             border: 2px solid #00aa00;
             padding: 15px;
-            min-height: 260px;
+            min-height: 270px;
             text-align: left;
             margin: 15px 0;
             border-radius: 10px;
@@ -110,7 +110,6 @@
             text-shadow: 0 0 2px #00ff00;
         }
 
-        /* ОТРИСОВКА РТА */
         .mouth-scanner {
             background-color: #000;
             border: 1px dashed #00ff00;
@@ -134,7 +133,6 @@
             margin-top: 15px;
         }
 
-        /* ТАКТИЛЬНЫЕ КНОПКИ */
         button.game-btn {
             font-family: 'Courier New', Courier, monospace;
             font-size: 14px;
@@ -156,19 +154,11 @@
             border-color: #00ff00;
             box-shadow: 0 4px 0 #002200, 0 0 10px rgba(0,255,0,0.2); 
         }
-        #btn-allow:active {
-            box-shadow: 0 1px 0 #002200;
-        }
-
         #btn-alarm { 
             background-color: #440000; 
             border-color: #ff0000;
             box-shadow: 0 4px 0 #220000, 0 0 10px rgba(255,0,0,0.2); 
         }
-        #btn-alarm:active {
-            box-shadow: 0 1px 0 #220000;
-        }
-
         #btn-next {
             background-color: #222;
             margin-top: 15px;
@@ -177,23 +167,28 @@
             color: #fff;
         }
 
-        /* ПОЛНОЭКРАННЫЙ СКРИМЕР — ЧИСТЫЙ АНАЛОГОВЫЙ ГЛИТЧ */
+        /* ПОЛНОЭКРАННЫЙ СКРИМЕР — МОРДА ВАСИЛИЯ */
         #screamer-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: #ff0000;
+            background-color: #110000;
             z-index: 9999;
-            justify-content: center; align-items: center;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;
+            overflow: hidden;
         }
 
-        #glitch-face {
-            font-size: 12px;
-            color: #000;
+        #vasily-ascii {
+            font-size: 10px;
+            color: #ff0000;
             font-weight: bold;
-            line-height: 8px;
+            line-height: 7px;
+            letter-spacing: 2px;
             white-space: pre;
             text-align: center;
+            text-shadow: 0 0 15px #ff0000;
         }
 
         .screamer-active {
@@ -201,26 +196,42 @@
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(15px, -15px) scale(1.3); filter: invert(0); }
-            50% { transform: translate(-15px, 15px) scale(1.1) invert(1); }
-            100% { transform: translate(10px, 10px) scale(1.4); }
+            0% { transform: translate(25px, -20px) scale(1.4); filter: invert(0); }
+            50% { transform: translate(-25px, 20px) scale(1.2) invert(1); }
+            100% { transform: translate(15px, 15px) scale(1.5); }
         }
 
         @keyframes flash-screen {
-            0%, 100% { background-color: #110000; }
-            50% { background-color: #ff0000; }
+            0%, 100% { background-color: #000000; }
+            50% { background-color: #440000; }
         }
     </style>
 </head>
 <body>
 
 <div id="screamer-overlay">
-    <div id="glitch-face">
-❌ СБОЙ МАТРИЦЫ ГЛАЗА ❌
-💀 ТВАРИ ВНУТРИ 💀
-💥 СИСТЕМА УНИЧТОЖЕНА 💥
-⚡ СИСТЕМА УНИЧТОЖЕНА ⚡
-☠️ ОШИБКА ☠️
+    <div id="vasily-ascii">
+       .---.              .---.
+      /     \            /     \
+      | () () |          | () () |
+       \  ^  /            \  ^  /
+        |||||              |||||
+        |||||     ====     |||||
+    
+    ==================================
+    ⚠️ ВАСИЛИЙ ИЗ 3-Б ОБНАРУЖЕН ⚠️
+    ==================================
+         
+          /$$   /$$ /$$   /$$ /$$      
+         | $$  /$$/| $$  | $$| $$      
+         | $$ /$$/ | $$  | $$| $$      
+         | $$$$$/  | $$$$$$$$| $$      
+         | $$  $$  | $$__  $$|__/      
+         | $$ \  $$| $$  | $$          
+         | $$  \  $| $$  | $$ /$$      
+         |__/   \__|__/  |__/|__/      
+
+    ☠️ ОШИБКА БЛОКА: ОН ЗДЕСЬ ☠️
     </div>
 </div>
 
@@ -239,45 +250,54 @@
         
         <div id="monitor">
             <div id="monitor-content" onclick="startGame()" style="text-align: center; padding-top: 75px; font-size: 14px; color: #ff3333; cursor:pointer; font-weight:bold; letter-spacing: 1px; line-height: 1.6;">
-                [ КЛИКНИТЕ ПО ЭКРАНУ ДЛЯ ЗАПУСКА КИНЕСКОПА И СИНХРОНИЗАЦИИ ЗВУКА ]
+                [ КЛИКНИТЕ ПО ЭКРАНУ ДЛЯ СИНХРОНИЗАЦИИ ЗВУКА И ЗАПУСКА ТЕРМИНАЛА ]
             </div>
         </div>
 
         <div class="btn-group">
-            <button id="btn-allow" class="game-btn" onclick="allowEntry()" style="display:none;">ВПУСТИТЬ</button>
-            <button id="btn-alarm" class="game-btn" onclick="triggerAlarm()" style="display:none;">ЛИКВИДИРОВАТЬ</button>
+            <button id="btn-allow" class="game-btn" onclick="allowEntry()">ВПУСТИТЬ</button>
+            <button id="btn-alarm" class="game-btn" onclick="triggerAlarm()">ЛИКВИДИРОВАТЬ</button>
         </div>
         <button id="btn-next" class="game-btn" onclick="nextVisitor()" style="display:none;">ЗАГРУЗИТЬ СЛЕДУЮЩИЙ ОБЪЕКТ</button>
     </div>
 </div>
 
 <script>
+// Мирные жители: зубы всегда идеальные
 const humans = [
-    { name: "Алексей П.", eyes: "Обычные", pulse: "74 уд/мин", mouth: "Норма", mouthDraw: "[|||||||||]\nЗубы чистые, десны розовые", anomaly: "Гражданин вернулся со смены в блоке гидро-очистки." },
-    { name: "Елена К.", eyes: "Ясные", pulse: "81 уд/мин", mouth: "Норма", mouthDraw: "[|||||||||]\nСледов заражения не обнаружено", anomaly: "Жалуется на едкий запах гари на внешнем периметре." },
-    { name: "Михаил В.", eyes: "Уставшие", pulse: "70 уд/мин", mouth: "Норма", mouthDraw: "[|||||||||]\nПрисутствуют следы табака", anomaly: "Шахтер. Документы покрыты угольной пылью." }
+    { name: "Алексей П.", eyes: "Обычные", pulse: "74 уд/мин", mouthDraw: "[|||||||||]\nЗубы ровные, десны чистые", anomaly: "Гражданин вернулся со смены в блоке гидро-очистки." },
+    { name: "Елена К.", eyes: "Ясные", pulse: "81 уд/мин", mouthDraw: "[|||||||||]\nСледов деформаций челюсти нет", anomaly: "Жалуется на едкий запах гари на внешнем периметре." },
+    { name: "Сергей Д.", eyes: "Уставшие", pulse: "68 уд/мин", mouthDraw: "[|||||||||]\nЗубной ряд без изменений", anomaly: "Инженер вентиляционного хаба. Документы в порядке." }
 ];
 
+// Твари: теперь признаки рта КРАЙНЕ разнообразны
 const monsters = [
     { 
-        name: "Неизвестный", 
-        eyes: "Стеклянные", 
-        pulse: "140 уд/мин", 
-        mouth: "ЧЁРНЫЕ ЗУБЫ", 
-        mouthDraw: "[▰▰▰▰▰▰▰▰▰]\n⚠️ ЗУБНАЯ ЭМАЛЬ ПОЛНОСТЬЮ ОБУГЛЕНА", 
-        anomaly: "ПРИЗНАК: Объект пытается не открывать рот при разговоре.", 
+        name: "Василий из 3-Б (Подражатель)", 
+        eyes: "Стеклянные, пустые", 
+        pulse: "190 уд/мин", 
+        mouthDraw: "[▰▰▰▰▰▰▰▰▰]\n⚠️ ВНИМАНИЕ: ЗУБНАЯ ЭМАЛЬ ПОЛНОСТЬЮ ОГНЕУПОРНО-ЧЕРНАЯ", 
+        anomaly: "ПРИЗНАК: Пытается косить под старого одноклассника. Улыбается слишком широко.", 
         isMonster: true, 
-        scaryMsg: "Подражатель с чёрными зубами перекусил кабели питания терминала вместе со всеми твоими пальцами." 
+        scaryMsg: "Василий из 3-Б залез в вентиляцию терминала. Спасения нет." 
+    },
+    { 
+        name: "Николай В.", 
+        eyes: "Затуманенные", 
+        pulse: "115 уд/мин", 
+        mouthDraw: "[vvvvvvvvv]\n⚠️ ВНИМАНИЕ: СТРУКТУРА ЗУБОВ ПРИНЯЛА ИГОЛЬЧАТУЮ ФОРМУ", // КРОВИ НЕТ, НО ЗУБЫ ОСТРЫЕ
+        anomaly: "ПРИЗНАК: Края челюсти пилообразные. Объект неестественно сглатывает слюну.", 
+        isMonster: true, 
+        scaryMsg: "Николай прокусил кабели питания. Терминал заблокирован изнутри тварью." 
     },
     { 
         name: "Анна С.", 
         eyes: "Бегающие", 
         pulse: "45 уд/мин", 
-        mouth: "КРОВЬ НА ДЁСНАХ", 
-        mouthDraw: "[|🩸|🩸||🩸|]\n⚠️ ВЫДЕЛЕНИЕ ЧЕРНОЙ КРОВИ ИЗ-ПОД РЕЗЦОВ", 
-        anomaly: "ПРИЗНАК: Сканер зафиксировал скрытое гниение тканей челюсти.", 
+        mouthDraw: "[|🩸|🩸||🩸|]\n⚠️ ВНИМАНИЕ: ОБНАРУЖЕНЫ СЛЕДЫ ЧЕРНОЙ КРОВИ НА ДЁСНАХ", // Классический кровавый
+        anomaly: "ПРИЗНАК: Сканер зафиксировал скрытое гниение мягких тканей нёба.", 
         isMonster: true, 
-        scaryMsg: "Зараженная Анна разверзла пасть прямо перед твоим лицом. Твой сектор заражен." 
+        scaryMsg: "Зараженная тварь разорвала шлюз. Сектор аннигилирован." 
     }
 ];
 
@@ -286,6 +306,7 @@ let lives = 3;
 let currentVisitor = null;
 let gameOver = false;
 let audioStarted = false;
+let isProcessing = false; // Блокировка кнопок во время анимации
 
 let audioCtx = null;
 let osc1 = null, osc2 = null;
@@ -295,28 +316,25 @@ let timeLeft = 100;
 let timerInterval = null;
 let baseTime = 7000; 
 
-// ПОЛНАЯ ИНИЦИАЛИЗАЦИЯ ЗВУКОВОГО ДВИЖКА (РЕШАЕТ ПРОБЛЕМУ БЛОКИРОВКИ БРАУЗЕРА)
 function initAudioEngine() {
     if (audioStarted) return;
     try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // НАГНЕТАЮЩАЯ МУЗЫКА (Тяжелый аналоговый гул и пульсация)
         osc1 = audioCtx.createOscillator();
         osc2 = audioCtx.createOscillator();
         ambientGain = audioCtx.createGain();
         
         osc1.type = 'sawtooth';
-        osc1.frequency.setValueAtTime(36, audioCtx.currentTime); // Сверхнизкий гул
-        
+        osc1.frequency.setValueAtTime(34, audioCtx.currentTime); 
         osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(38, audioCtx.currentTime); // Интерференция, создающая биение
+        osc2.frequency.setValueAtTime(36, audioCtx.currentTime); 
         
         let lowpass = audioCtx.createBiquadFilter();
         lowpass.type = 'lowpass';
-        lowpass.frequency.setValueAtTime(70, audioCtx.currentTime);
+        lowpass.frequency.setValueAtTime(65, audioCtx.currentTime);
 
-        ambientGain.gain.setValueAtTime(0.25, audioCtx.currentTime); // Громкий, давящий фон
+        ambientGain.gain.setValueAtTime(0.3, audioCtx.currentTime); 
         
         osc1.connect(lowpass);
         osc2.connect(lowpass);
@@ -327,53 +345,43 @@ function initAudioEngine() {
         osc2.start();
         
         audioStarted = true;
-    } catch(e) { console.log("Ошибка аудио:", e); }
+    } catch(e) { console.log(e); }
 }
 
-// ЗВУК ПРОПУСКА (ЭЛЕКТРОННЫЙ КЛИК)
 function playAllowSound() {
     if (!audioCtx) return;
     let osc = audioCtx.createOscillator();
     let gain = audioCtx.createGain();
-    
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.08);
-    
-    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(550, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-    
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.start();
     osc.stop(audioCtx.currentTime + 0.08);
 }
 
-// МОЩНЫЙ ВЫСТРЕЛ ИЗ ДРОБОВИКА (ГЕНЕРИРУЕТСЯ КОДОМ, НЕ ОТВАЛИТСЯ)
 function playShotgunShot() {
     if (!audioCtx) return;
-    
-    let bufferSize = audioCtx.sampleRate * 0.8; // Длина 0.8 сек
+    let bufferSize = audioCtx.sampleRate * 0.7;
     let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     let data = buffer.getChannelData(0);
-    
-    // Наполняем мощным агрессивным взрывным шумом
     for (let i = 0; i < bufferSize; i++) {
         data[i] = Math.random() * 2 - 1;
     }
-    
     let noiseNode = audioCtx.createBufferSource();
     noiseNode.buffer = buffer;
     
     let filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
-    // Фильтр резко падает, имитируя глухой раскат взрыва пороха и эхо в бункере
-    filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.6);
+    filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.5);
     
     let gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(1.5, audioCtx.currentTime); // Хлёсткий пик
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+    gain.gain.setValueAtTime(1.6, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
     
     noiseNode.connect(filter);
     filter.connect(gain);
@@ -381,35 +389,34 @@ function playShotgunShot() {
     noiseNode.start();
 }
 
-// СИНТЕТИЧЕСКИЙ ЖУТКИЙ ВОПЛЬ ДЛЯ СКРИМЕРА
 function playScreamerSound() {
     if (!audioCtx) return;
     let osc = audioCtx.createOscillator();
     let gain = audioCtx.createGain();
-    
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-    osc.frequency.linearRampToValueAtTime(900, audioCtx.currentTime + 0.4);
+    osc.frequency.setValueAtTime(280, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(850, audioCtx.currentTime + 0.2);
+    osc.frequency.linearRampToValueAtTime(120, audioCtx.currentTime + 0.6);
+    osc.frequency.linearRampToValueAtTime(600, audioCtx.currentTime + 1.2);
     
-    // Модуляция ужаса
     let mod = audioCtx.createOscillator();
     let modGain = audioCtx.createGain();
-    mod.frequency.setValueAtTime(50, audioCtx.currentTime);
-    modGain.gain.setValueAtTime(100, audioCtx.currentTime);
+    mod.type = 'square';
+    mod.frequency.setValueAtTime(85, audioCtx.currentTime);
+    modGain.gain.setValueAtTime(250, audioCtx.currentTime);
     
     mod.connect(modGain);
     modGain.connect(osc.frequency);
     
-    gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+    gain.gain.setValueAtTime(1.8, audioCtx.currentTime); 
+    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 1.3);
     
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    
     mod.start();
     osc.start();
-    mod.stop(audioCtx.currentTime + 1.2);
-    osc.stop(audioCtx.currentTime + 1.2);
+    mod.stop(audioCtx.currentTime + 1.3);
+    osc.stop(audioCtx.currentTime + 1.3);
 }
 
 const monitor = document.getElementById('monitor');
@@ -422,6 +429,10 @@ const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
 const overlay = document.getElementById('screamer-overlay');
 
+// Скрытие кнопок управления до старта
+btnAllow.style.display = "none";
+btnAlarm.style.display = "none";
+
 function startGame() {
     initAudioEngine();
     nextVisitor();
@@ -433,11 +444,11 @@ function startTimer() {
     timerBar.style.width = "100%";
     timerBar.style.backgroundColor = "#00ff00";
     
-    let currentLimit = Math.max(2000, baseTime - (score * 400)); 
+    let currentLimit = Math.max(2000, baseTime - (score * 350)); 
     let step = 100 / (currentLimit / 40);
 
     timerInterval = setInterval(() => {
-        if (gameOver) return;
+        if (gameOver || isProcessing) return;
         timeLeft -= step;
         if (timeLeft < 0) timeLeft = 0;
         timerBar.style.width = timeLeft + "%";
@@ -447,7 +458,7 @@ function startTimer() {
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            executeScreamer("ВРЕМЯ ИСТЕКЛО! Тварь выбила гермозатвор консоли!");
+            executeScreamer("ВРЕМЯ ИСТЕКЛО! Защита периметра пробита.");
         }
     }, 40);
 }
@@ -461,9 +472,10 @@ function nextVisitor() {
         gameOver = false;
         overlay.style.display = "none";
         overlay.classList.remove('screamer-active');
-        if(ambientGain) ambientGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        if(ambientGain) ambientGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
     }
     
+    isProcessing = false;
     monitor.style.backgroundColor = "#020402";
     monitor.style.opacity = "1";
     
@@ -471,7 +483,7 @@ function nextVisitor() {
     btnAlarm.style.display = "inline-block";
     btnNext.style.display = "none";
 
-    let monsterChance = Math.min(0.85, 0.3 + (score * 0.07));
+    let monsterChance = Math.min(0.85, 0.35 + (score * 0.08));
     if (Math.random() < monsterChance) {
         currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
     } else {
@@ -491,10 +503,10 @@ function renderVisitor() {
         
         <div class="stat-line" style="color:#00ffff; margin-top:5px;"><b>[СКАНИРОВАНИЕ ПОЛОСТИ РТА]:</b></div>
         <div class="mouth-scanner">
-            <span style="color:${currentVisitor.isMonster ? '#ff0000' : '#00ff00'}">${currentVisitor.mouthDraw}</span>
+            <span style="color:${currentVisitor.isMonster ? '#ff5555' : '#00ff00'}">${currentVisitor.mouthDraw}</span>
         </div>
 
-        <div class="stat-line anomaly-box"><b>База данных / Логи периметра:</b><br>>> ${currentVisitor.anomaly}</div>
+        <div class="stat-line anomaly-box"><b>Логи периметра:</b><br>>> ${currentVisitor.anomaly}</div>
     `;
 }
 
@@ -516,73 +528,114 @@ function executeScreamer(msg) {
         
         monitor.style.backgroundColor = "#2a0000";
         monitorContent.innerHTML = `
-            <div class="stat-line" style="color: #ff0000; font-size: 16px; font-weight: bold; text-align:center;">🔴 БУНКЕР ПАЛ 🔴</div><br>
-            <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000; font-size:12px;"><b>ОТЧЕТ СИСТЕМЫ ПЕРИМЕТРА:</b><br>${msg}</div>
+            <div class="stat-line" style="color: #ff0000; font-size: 16px; font-weight: bold; text-align:center;">🔴 БУНКЕР АННИГИЛИРОВАН 🔴</div><br>
+            <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000; font-size:12px;"><b>РЕЗУЛЬТАТ:</b><br>${msg}</div>
         `;
         btnNext.innerText = "ПЕРЕЗАПУСТИТЬ ТЕРМИНАЛ";
         btnNext.style.display = "block";
-    }, 1300);
+    }, 1500);
 }
 
+// АНИМАЦИЯ НАЖАТИЯ НА ЗЕЛЕНУЮ КНОПКУ (ВПУСТИТЬ)
 function allowEntry() {
-    if (gameOver) return;
+    if (gameOver || isProcessing) return;
+    isProcessing = true;
     clearInterval(timerInterval);
     
-    btnAllow.style.display = "none";
-    btnAlarm.style.display = "none";
-    
-    // АНИМАЦИЯ И ЗВУК ПРОПУСКА
     playAllowSound();
-    monitor.style.backgroundColor = "#004400"; // Зеленая вспышка экрана
+    monitor.style.backgroundColor = "#001a00";
     
-    setTimeout(() => {
-        if (currentVisitor.isMonster) {
-            executeScreamer(currentVisitor.scaryMsg);
-        } else {
-            score++;
-            scoreText.innerText = score;
-            monitor.style.backgroundColor = "#020c02";
-            monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 15px; color:#00ff00; font-weight:bold;">ШЛЮЗ РАЗБЛОКИРОВАН.<br>Объект зашел в жилой сектор.</div>`;
-            btnNext.style.display = "block";
+    // Пошаговая текстовая анимация на экране терминала
+    monitorContent.innerHTML = `<br><br><div class="stat-line" style="color:#00ff00; text-align:center;">[ИНИЦИАЛИЗАЦИЯ ШЛЮЗА...]</div>`;
+    
+    let progress = "";
+    let count = 0;
+    
+    let animInterval = setInterval(() => {
+        count++;
+        progress += "■";
+        monitorContent.innerHTML = `
+            <br><br>
+            <div class="stat-line" style="color:#00ff00; text-align:center;"><b>[ПЕЧАТЬ СЕРТИФИКАТА ПРОПУСКА]</b></div>
+            <div class="stat-line" style="color:#00ff00; text-align:center;">${progress}</div>
+        `;
+        
+        if (count >= 5) {
+            clearInterval(animInterval);
+            
+            // Финал анимации пропуска
+            monitor.style.backgroundColor = "#004400";
+            monitorContent.innerHTML = `
+                <br><br>
+                <div class="stat-line" style="text-align:center; font-size: 16px; color:#00ff00; font-weight:bold; border:2px solid #00ff00; padding:5px; background:#000;">
+                    [СТАТУС: ДОСТУП РАЗРЕШЕН]
+                </div>
+            `;
+            
+            setTimeout(() => {
+                btnAllow.style.display = "none";
+                btnAlarm.style.display = "none";
+                
+                if (currentVisitor.isMonster) {
+                    executeScreamer(currentVisitor.scaryMsg);
+                } else {
+                    score++;
+                    scoreText.innerText = score;
+                    monitor.style.backgroundColor = "#020c02";
+                    monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 15px; color:#00ff00; font-weight:bold;">ШЛЮЗ ЗАКРЫТ.<br>Объект успешно перемещен в сектор.</div>`;
+                    btnNext.style.display = "block";
+                }
+            }, 600);
         }
     }, 150);
 }
 
+// АНИМАЦИЯ НАЖАТИЯ НА КРАСНУЮ КНОПКУ (ЛИКВИДИРОВАТЬ)
 function triggerAlarm() {
-    if (gameOver) return;
+    if (gameOver || isProcessing) return;
+    isProcessing = true;
     clearInterval(timerInterval);
     
-    btnAllow.style.display = "none";
-    btnAlarm.style.display = "none";
-
-    // ХЛЁСТКИЙ ВЫСТРЕЛ ИЗ ДРОБОВИКА И ТЕМНЫЙ ЭКРАН
-    playShotgunShot();
-    monitor.style.opacity = "0";
-    monitor.style.backgroundColor = "#000000";
+    monitor.style.backgroundColor = "#1a0000";
+    monitorContent.innerHTML = `
+        <br><br>
+        <div class="stat-line" style="color:#ff0000; text-align:center; font-weight:bold; animation: crt-glow 0.05s infinite;">
+            ⚠️ [ЗАПУСК СИСТЕМЫ ОЧИСТКИ КАМЕРЫ] ⚠️
+        </div>
+    `;
 
     setTimeout(() => {
-        monitor.style.opacity = "1";
-        if (currentVisitor.isMonster) {
-            score++;
-            scoreText.innerText = score;
-            monitor.style.backgroundColor = "#020c02";
-            monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 15px; color: #00ff00; font-weight: bold;">УГРОЗА ЛИКВИДИРОВАНА.<br>Камера шлюза очищена выстрелом.</div>`;
-            btnNext.style.display = "block";
-        } else {
-            lives--;
-            let stars = "";
-            for(let i=0; i<3; i++) stars += i < lives ? "★" : "☆";
-            livesText.innerText = stars;
+        playShotgunShot();
+        monitor.style.opacity = "0";
+        monitor.style.backgroundColor = "#000000";
 
-            if (lives <= 0) {
-                executeScreamer("Вы расстреляли слишком много мирных граждан. Командование заблокировало ваш сектор.");
-            } else {
-                monitor.style.backgroundColor = "#221100";
-                monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 15px; color: #ffaa00; font-weight: bold;">ОШИБКА ДЕПАРТАМЕНТА!<br>Ликвидирован человек с чистым ртом. Наложен штраф.</div>`;
+        setTimeout(() => {
+            monitor.style.opacity = "1";
+            btnAllow.style.display = "none";
+            btnAlarm.style.display = "none";
+            
+            if (currentVisitor.isMonster) {
+                score++;
+                scoreText.innerText = score;
+                monitor.style.backgroundColor = "#020c02";
+                monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 15px; color: #00ff00; font-weight: bold;">УГРОЗА УСПЕШНО ЛИКВИДИРОВАНА.<br>Камера шлюза очищена выстрелом дробовика.</div>`;
                 btnNext.style.display = "block";
+            } else {
+                lives--;
+                let stars = "";
+                for(let i=0; i<3; i++) stars += i < lives ? "★" : "☆";
+                livesText.innerText = stars;
+
+                if (lives <= 0) {
+                    executeScreamer("Вы расстреляли слишком много мирных граждан. Командование заблокировало ваш сектор.");
+                } else {
+                    monitor.style.backgroundColor = "#221100";
+                    monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 15px; color: #ffaa00; font-weight: bold;">ОШИБКА ДЕПАРТАМЕНТА!<br>Объект являлся чистым человеком. Наложен штраф.</div>`;
+                    btnNext.style.display = "block";
+                }
             }
-        }
-    }, 400); 
+        }, 400);
+    }, 600); // Небольшая задержка перед выстрелом для нагнетания
 }
 </script>
 
