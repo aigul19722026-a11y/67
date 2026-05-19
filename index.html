@@ -185,7 +185,7 @@ const container = document.getElementById('game-container');
 function generateRandomHuman() {
     const randomName = humanNames[Math.floor(Math.random() * humanNames.length)];
     const randomEyes = humanEyes[Math.floor(Math.random() * humanEyes.length)];
-    const randomPulse = Math.floor(Math.random() * (90 - 65 + 1)) + 65 + " уд/мин"; // Здоровый пульс от 65 до 90
+    const randomPulse = Math.floor(Math.random() * (90 - 65 + 1)) + 65 + " уд/мин";
     const randomAnomaly = humanAnomalies[Math.floor(Math.random() * humanAnomalies.length)];
     
     return {
@@ -199,7 +199,6 @@ function generateRandomHuman() {
 }
 
 function nextVisitor() {
-    // Если была игра окончена, сбрасываем всё
     if(gameOver) {
         score = 0;
         scoreText.innerText = score;
@@ -213,7 +212,6 @@ function nextVisitor() {
     btnAlarm.style.display = "inline-block";
     btnNext.style.display = "none";
 
-    // Рандомим: 50% шанс встретить монстра, 50% шанс сгенерировать абсолютно уникального человека
     if (Math.random() < 0.5) {
         currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
     } else {
@@ -234,7 +232,6 @@ function allowEntry() {
     btnAlarm.style.display = "none";
     
     if (currentVisitor.isMonster) {
-        // СКРИМЕР И ПОЛНЫЙ ПРОИГРЫШ
         gameOver = true;
         container.classList.add('screamer-active');
         monitor.style.backgroundColor = "#550000";
@@ -246,4 +243,39 @@ function allowEntry() {
         `;
         btnNext.innerText = "НАЧАТЬ ЗАНОВО";
         btnNext.style.display = "block";
+    } else {
+        score++;
+        scoreText.innerText = score;
+        monitor.style.backgroundColor = "#003300";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px;">Это обычный человек. <br>Он успешно прошёл в сектор безопасности.</div>`;
+        btnNext.innerText = "СЛЕДУЮЩИЙ В ОЧЕРЕДИ";
+        btnNext.style.display = "block";
     }
+}
+
+function triggerAlarm() {
+    btnAllow.style.display = "none";
+    btnAlarm.style.display = "none";
+
+    if (currentVisitor.isMonster) {
+        score++;
+        scoreText.innerText = score;
+        monitor.style.backgroundColor = "#003300";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00; font-weight: bold;">УГРОЗА ЛИКВИДИРОВАНА!<br><br>Автоматическая турель сожгла подражателя на месте. Проверка продолжается.</div>`;
+    } else {
+        score = Math.max(0, score - 1);
+        scoreText.innerText = score;
+        monitor.style.backgroundColor = "#555500";
+        monitor.style.color = "#000";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; font-weight: bold;">ТРАГЕДИЯ.<br><br>Вы ликвидировали невиновного человека. Штрафные санкции за паранойю применены к вашему счету.</div>`;
+    }
+    btnNext.innerText = "СЛЕДУЮЩИЙ В ОЧЕРЕДИ";
+    btnNext.style.display = "block";
+}
+
+// Запуск первой сессии
+nextVisitor();
+</script>
+
+</body>
+</html>
