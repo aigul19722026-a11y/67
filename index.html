@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ОКП: Отдел Контроля Подражателей - ХАРДКОР</title>
+    <title>ОКП: Отдел Контроля Подражателей - ХАРДКОР v2.0</title>
     <style>
         body {
             background-color: #030303;
@@ -41,6 +41,7 @@
             border: 1px solid #ff0000;
             color: #ff0000;
             cursor: pointer;
+            z-index: 10;
         }
 
         h1 {
@@ -64,7 +65,6 @@
             font-weight: bold;
         }
 
-        /* ТАЙМЕР ПАНИКИ */
         #timer-container {
             width: 100%;
             height: 8px;
@@ -78,20 +78,20 @@
         #timer-bar {
             width: 100%;
             height: 100%;
-            background-color: #ff0000;
-            transition: width 0.1s linear;
-            box-shadow: 0 0 10px #ff0000;
+            background-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
         }
 
         #monitor {
             background-color: #111;
             border: 2px solid #ff0000;
             padding: 20px;
-            min-height: 200px;
+            min-height: 220px;
             text-align: left;
             margin: 15px 0;
             border-radius: 5px;
             box-shadow: inset 0 0 15px #000;
+            box-sizing: border-box;
         }
 
         .stat-line {
@@ -139,7 +139,7 @@
         }
         #btn-next:hover { background-color: #333; }
 
-        /* ЭКРАН СКРИМЕРА */
+        /* ПОЛНОЭКРАННЫЙ СКРИМЕР С ЖУТКИМ ЛИЦОМ */
         #screamer-overlay {
             display: none;
             position: fixed;
@@ -154,47 +154,76 @@
             overflow: hidden;
         }
 
-        #screamer-image {
+        #screamer-svg {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            max-width: 800px;
+            max-height: 800px;
             display: none;
         }
 
         .screamer-active {
-            animation: hard-shake 0.02s infinite, flash-screen 0.04s infinite, zoom-in 0.6s forwards;
+            animation: hard-shake 0.015s infinite, flash-screen 0.03s infinite, zoom-in 0.5s forwards;
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(25px, 20px) scale(1.2); filter: hue-rotate(0deg) contrast(3); }
-            50% { transform: translate(-25px, -20px) scale(0.9); filter: hue-rotate(180deg) invert(1); }
-            100% { transform: translate(20px, -25px) scale(1.3); filter: hue-rotate(360deg) saturate(5); }
+            0% { transform: translate(30px, 25px) scale(1.3); filter: contrast(3) brightness(1.5); }
+            50% { transform: translate(-30px, -25px) scale(0.95) invert(1); filter: hue-rotate(180deg); }
+            100% { transform: translate(25px, -30px) scale(1.4); filter: contrast(4) saturate(3); }
         }
 
         @keyframes flash-screen {
             0%, 100% { background-color: #000; }
-            50% { background-color: #400; }
+            50% { background-color: #200; }
         }
 
         @keyframes zoom-in {
-            0% { transform: scale(0.7); }
-            100% { transform: scale(2.0); }
+            0% { transform: scale(0.6); }
+            100% { transform: scale(2.5); }
         }
     </style>
 </head>
 <body>
 
 <div id="screamer-overlay">
-    <svg id="screamer-image" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="200" height="200" fill="black"/>
-        <circle cx="100" cy="95" r="55" fill="#151515"/>
-        <ellipse cx="75" cy="85" rx="18" ry="24" fill="white"/>
-        <ellipse cx="125" cy="85" rx="18" ry="24" fill="white"/>
-        <circle cx="75" cy="85" r="6" fill="black"/>
-        <circle cx="125" cy="85" r="6" fill="black"/>
-        <ellipse cx="100" cy="145" rx="28" ry="40" fill="white"/>
-        <ellipse cx="100" cy="145" rx="22" ry="34" fill="black"/>
-        <path d="M 0,0 L 200,200 M 0,200 L 200,0" stroke="red" stroke-width="1" opacity="0.4"/>
+    <!-- Реалистичное деформированное лицо аналогового хоррора -->
+    <svg id="screamer-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#000000"/>
+        
+        <!-- Асимметричный, размытый череп-маска -->
+        <path d="M 50,70 C 45,30 155,25 150,70 C 145,110 135,165 100,175 C 65,165 55,110 50,70 Z" fill="#1c1c1c" stroke="#0a0a0a" stroke-width="2"/>
+        
+        <!-- Левая провалившаяся глазница (искаженная) -->
+        <path d="M 62,75 Q 75,55 88,72 Q 82,95 65,90 Z" fill="#ffffff"/>
+        <path d="M 68,78 Q 74,65 82,76 Q 78,88 70,85 Z" fill="#000000"/>
+        <circle cx="74" cy="78" r="3" fill="#ffffff" opacity="0.8"/>
+
+        <!-- Правая глазница (шире и ниже — эффект деформации) -->
+        <path d="M 112,78 Q 128,62 142,82 Q 132,108 115,98 Z" fill="#ffffff"/>
+        <path d="M 118,82 Q 126,72 134,85 Q 128,96 121,92 Z" fill="#000000"/>
+        <circle cx="124" cy="84" r="2" fill="#ffffff" opacity="0.8"/>
+
+        <!-- Тёмные потеки под глазами -->
+        <path d="M 65,90 L 62,115 L 72,100 L 78,125 L 85,92 Z" fill="#0a0a0a" opacity="0.7"/>
+        <path d="M 115,98 L 118,130 L 126,110 L 132,135 L 138,92 Z" fill="#0a0a0a" opacity="0.7"/>
+
+        <!-- Огромный, разорванный, асимметричный рот -->
+        <path d="M 70,130 Q 100,110 130,128 Q 145,165 100,185 Q 55,160 70,130 Z" fill="#ffffff"/>
+        <path d="M 75,134 Q 100,118 125,132 Q 135,160 100,178 Q 65,155 75,134 Z" fill="#000000"/>
+        
+        <!-- Кривые, острые зубы -->
+        <polygon points="80,135 83,145 86,135" fill="#eeeeee"/>
+        <polygon points="90,134 94,148 98,135" fill="#eeeeee"/>
+        <polygon points="102,135 106,149 110,136" fill="#eeeeee"/>
+        <polygon points="114,134 118,144 122,135" fill="#eeeeee"/>
+        
+        <polygon points="82,156 86,146 90,155" fill="#eeeeee"/>
+        <polygon points="96,162 100,148 104,160" fill="#eeeeee"/>
+        <polygon points="110,158 113,147 117,155" fill="#eeeeee"/>
+
+        <!-- Помехи и царапины поверх лица -->
+        <path d="M 5,25 L 195,175 M 10,160 L 185,45" stroke="#ff0000" stroke-width="0.7" opacity="0.3"/>
+        <path d="M 30,5 L 35,195 M 165,10 L 160,190" stroke="#fff" stroke-width="0.5" opacity="0.2"/>
     </svg>
 </div>
 
@@ -203,8 +232,8 @@
     <h1>РЕЖИМ: ЧИСТКА СИСТЕМЫ</h1>
     
     <div id="ui-box">
-        <div>Успешно стерто/пропущено: <span id="score" style="color:#00ff00; font-weight:bold;">0</span></div>
-        <div id="lives-box">ЦЕЛОСТНОСТЬ СИСТЕМЫ: <span id="lives">★★★</span></div>
+        <div>Успешно проверено: <span id="score" style="color:#00ff00; font-weight:bold;">0</span></div>
+        <div id="lives-box">ЦЕЛОСТНОСТЬ: <span id="lives">★★★</span></div>
     </div>
 
     <div id="timer-container">
@@ -212,8 +241,8 @@
     </div>
     
     <div id="monitor">
-        <div id="monitor-content" style="text-align: center; padding-top: 40px; font-size: 18px; color: #ff0000; cursor:pointer; animation: pulse 1s infinite;">
-            ⚠️ НАЖМИ СЮДА ДЛЯ ЗАПУСКА ПРОТОКОЛА ОКП ⚠️
+        <div id="monitor-content" onclick="startGame()" style="text-align: center; padding-top: 50px; font-size: 16px; color: #ff0000; cursor:pointer; font-weight:bold;">
+            [ КЛИКНИ СЮДА ДЛЯ ЗАПУСКА ТЕРМИНАЛА ОКП ]
         </div>
     </div>
 
@@ -225,39 +254,61 @@
 </div>
 
 <script>
-const humanNames = ["Алексей", "Елена", "Михаил", "Ольга", "Иван", "Дмитрий", "Анна", "Сергей", "Наталья", "Артем"];
-const humanEyes = ["Карие, обычные", "Зеленые, ясные", "Голубые, уставшие", "Серые, испуганные"];
-const humanAnomalies = [
-    "Нет. Обычный гражданин, возвращается со смены.",
-    "Нет. Жалуется на туман за стеной бункера.",
-    "Нет. Просит чашку воды.",
-    "Нет. Документы в полном порядке."
+// БАЗА ДАННЫХ МИРНЫХ ЖИТЕЛЕЙ
+const humans = [
+    { name: "Алексей", eyes: "Карие, обычные", pulse: "72 уд/мин", anomaly: "Нет. Обычный гражданин, вернулся со смены на заводе." },
+    { name: "Елена", eyes: "Зеленые, ясные", pulse: "80 уд/мин", anomaly: "Нет. Жалуется на сильный туман на улице, просит укрытия." },
+    { name: "Михаил", eyes: "Голубые, уставшие", pulse: "68 уд/мин", anomaly: "Нет. Документы в порядке, слегка простужен." },
+    { name: "Ольга", eyes: "Серые, испуганные", pulse: "95 уд/мин", anomaly: "Нет. Сильно напугана сиреной, плачет, умоляет впустить." },
+    { name: "Иван", eyes: "Карие, сонные", pulse: "64 уд/мин", anomaly: "Нет. Потерял ключи от нижнего яруса, ищет ночлег." },
+    { name: "Дмитрий", eyes: "Зеленые, обычные", pulse: "75 уд/мин", anomaly: "Нет. Гражданин доставил сухпайки для охраны поста." },
+    { name: "Анна", eyes: "Голубые, спокойные", pulse: "70 уд/мин", anomaly: "Нет. Медсестра из блока Б, возвращается на дежурство." },
+    { name: "Сергей", eyes: "Темно-серые", pulse: "82 уд/мин", anomaly: "Нет. Инженер шлюзовых ворот, прибыл на плановый осмотр." },
+    { name: "Наталья", eyes: "Карие, ясные", pulse: "78 уд/мин", anomaly: "Нет. Сотрудник архива, документы полностью чистые." },
+    { name: "Артем", eyes: "Серые, уставшие", pulse: "85 уд/мин", anomaly: "Нет. Потерял фонарик в коридоре, просит пропустить внутрь." }
 ];
 
+// БАЗА ДАННЫХ МОНСТРОВ / ПОДРАЖАТЕЛЕЙ
 const monsters = [
     { 
         name: "txt.Dmitriy.copy", 
         eyes: "ОТСУТСТВУЮТ (ЧЕРНЫЕ ДЫРЫ)", 
-        pulse: "⚠️ КРИТИЧЕСКИЙ СБОЙ ЯДРА", 
-        anomaly: "Возраст: 12930897 лет. СИСТЕМА ПЕРЕГРУЖЕНА. Объект искажает код интерфейса.", 
+        pulse: "⚠️ ОШИБКА СЕРВЕРА ЯДРА", 
+        anomaly: "Возраст: 12930897 лет. СИСТЕМА ДЕСТАБИЛИЗИРОВАНА. Вместо лица — битый ломающийся код.", 
         isMonster: true, 
-        scaryMsg: "Древний вирус txt.Dmitriy.copy поглотил ядро терминала. Ему 12930897 лет. Из твоих колонок вырвался крик миллиардов стертых душ..." 
+        scaryMsg: "Древний системный баг txt.Dmitriy.copy сожрал твои данные. Ему 12930897 лет. Тебя утащило в бесконечную пустоту битого кода..." 
     },
     { 
         name: "Михаил", 
-        eyes: "Полностью черные", 
+        eyes: "Полностью черные (без белков)", 
         pulse: "0 уд/мин", 
-        anomaly: "Дыхание отсутствует. Лицо неподвижно застыло в широкой ухмылке.", 
+        anomaly: "Кожа ледяная. Лицо застыло в неестественно широкой, неподвижной ухмылке.", 
         isMonster: true, 
-        scaryMsg: "Подражатель Михаил пробрался внутрь. Он сорвал обшивку и затащил тебя в вентиляцию..." 
+        scaryMsg: "Подражатель Михаил пробрался в сектор. Он разорвал тебя на части, когда ты отвернулся к панели управления!" 
     },
     { 
-        name: "Иван", 
-        eyes: "Человеческие", 
-        pulse: "190 уд/мин", 
-        anomaly: "Прибор зафиксировал скрытые под кожей металлические импланты и хруст.", 
+        name: "Неизвестный", 
+        eyes: "Завязаны грязной тряпкой", 
+        pulse: "18 уд/мин", 
+        anomaly: "Вместо ответов на вопросы издает непрерывный хруст ломающихся костей под одеждой.", 
         isMonster: true, 
-        scaryMsg: "Иван оказался замаскированным био-киборгом. Защитные турели не успели среагировать." 
+        scaryMsg: "Существо сбросило маску. Из его груди вырвались костяные лезвия, пробившие защитное стекло!" 
+    },
+    { 
+        name: "Елена", 
+        eyes: "Слишком большие, не моргают", 
+        pulse: "230 уд/мин", 
+        anomaly: "Пальцы рук удлинены в два раза и имеют роговые наросты. Документы поддельные.", 
+        isMonster: true, 
+        scaryMsg: "Елена просочилась в бункер. Тварь двигалась со скоростью звука, у тебя не было шансов." 
+    },
+    { 
+        name: "Сержант Петров", 
+        eyes: "Светятся в темноте желтым", 
+        pulse: "Ошибка сканера", 
+        anomaly: "Одежда залита черной субстанцией. Требует немедленно открыть шлюз, угрожая оружием.", 
+        isMonster: true, 
+        scaryMsg: "Зараженный сержант расстрелял консоль управления и впустил остальных тварей снаружи." 
     }
 ];
 
@@ -269,68 +320,82 @@ let isPaused = false;
 let audioStarted = false;
 
 let audioCtx = null;
+let ambientOsc = null;
 let ambientGain = null;
 
 let timeLeft = 100;
 let timerInterval = null;
-let baseTime = 7000; // Начальное время: 7 секунд на человека
+let baseTime = 7000; // 7 секунд на размышление
 
 function initAudio() {
     if (audioStarted) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    let ambientOsc = audioCtx.createOscillator();
-    ambientGain = audioCtx.createGain();
-    ambientOsc.type = 'sawtooth'; 
-    ambientOsc.frequency.setValueAtTime(35, audioCtx.currentTime); 
-    
-    let filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(100, audioCtx.currentTime);
+    try {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        ambientOsc = audioCtx.createOscillator();
+        ambientGain = audioCtx.createGain();
+        ambientOsc.type = 'sawtooth'; 
+        ambientOsc.frequency.setValueAtTime(38, audioCtx.currentTime); 
+        
+        let filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(90, audioCtx.currentTime);
 
-    ambientGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    
-    ambientOsc.connect(filter);
-    filter.connect(ambientGain);
-    ambientGain.connect(audioCtx.destination);
-    ambientOsc.start();
-    audioStarted = true;
+        ambientGain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        
+        ambientOsc.connect(filter);
+        filter.connect(ambientGain);
+        ambientGain.connect(audioCtx.destination);
+        ambientOsc.start();
+        audioStarted = true;
+    } catch(e) { console.log("Аудио не поддерживается браузером"); }
 }
 
-function playHumanScream() {
+function playRealHumanScream() {
     if (!audioCtx) return;
-    let duration = 1.4;
+    
+    let duration = 1.5;
     let sampleRate = audioCtx.sampleRate;
     let bufferSize = sampleRate * duration;
     let buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
     let data = buffer.getChannelData(0);
 
+    // Синтезируем истошный крик: модулируемая волна + жесткий шумовой хрип
     for (let i = 0; i < bufferSize; i++) {
         let t = i / sampleRate;
         let noise = Math.random() * 2 - 1;
-        let vocal = Math.sin(2 * Math.PI * 210 * t + Math.sin(2 * Math.PI * 60 * t) * 4);
-        data[i] = (vocal * 0.3) + (noise * 0.7);
+        
+        // Основа крика: синусоида, резко уходящая вверх по частоте (эффект панического визга)
+        let freqMod = 250 + (t * 800) + Math.sin(2 * Math.PI * 70 * t) * 120;
+        let vocalWave = Math.sin(2 * Math.PI * freqMod * t);
+        
+        // Хрип связок и модуляция
+        let throatDistortion = Math.sin(2 * Math.PI * 45 * t);
+        
+        data[i] = (vocalWave * 0.35) + (noise * 0.55) + (throatDistortion * 0.1);
     }
 
     let source = audioCtx.createBufferSource();
     source.buffer = buffer;
 
+    // Резонансный полосовой фильтр для имитации крика в замкнутом коридоре
     let filter = audioCtx.createBiquadFilter();
     filter.type = 'bandpass';
-    filter.Q.setValueAtTime(5, audioCtx.currentTime);
-    filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(350, audioCtx.currentTime + duration);
+    filter.Q.setValueAtTime(3, audioCtx.currentTime);
+    filter.frequency.setValueAtTime(1300, audioCtx.currentTime);
+    filter.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + duration);
 
+    // Дисторшн (перегрузка) для эффекта разрыва динамиков
     let distortion = audioCtx.createWaveShaper();
     let curve = new Float32Array(44100);
     for (let i=0; i<44100; ++i) {
         let x = (i * 2) / 44100 - 1;
-        curve[i] = (3 + 150) * x * 20 * (Math.PI/180) / (Math.PI + 150 * Math.abs(x));
+        curve[i] = (3 + 200) * x * 15 * (Math.PI/180) / (Math.PI + 200 * Math.abs(x));
     }
     distortion.curve = curve;
 
     let gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(1.5, audioCtx.currentTime);
+    gain.gain.setValueAtTime(1.6, audioCtx.currentTime); // Очень громко
     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
 
     source.connect(filter);
@@ -349,14 +414,14 @@ const btnAllow = document.getElementById('btn-allow');
 const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
 const overlay = document.getElementById('screamer-overlay');
-const screamerImg = document.getElementById('screamer-image');
+const screamerSvg = document.getElementById('screamer-svg');
 
-document.body.addEventListener('click', function() {
+function startGame() {
     if (!audioStarted) {
         initAudio();
         nextVisitor();
     }
-});
+}
 
 function startTimer() {
     clearInterval(timerInterval);
@@ -364,27 +429,25 @@ function startTimer() {
     timerBar.style.width = "100%";
     timerBar.style.backgroundColor = "#00ff00";
     
-    // С ростом очков время уменьшается (но не меньше 2.5 секунд)
-    let currentLimit = Math.max(2500, baseTime - (score * 300)); 
-    let step = 100 / (currentLimit / 100);
+    // С ростом очков время уменьшается, доходя до жестких 2.2 секунд
+    let currentLimit = Math.max(2200, baseTime - (score * 400)); 
+    let step = 100 / (currentLimit / 50);
 
     timerInterval = setInterval(() => {
         if (isPaused || gameOver) return;
         timeLeft -= step;
+        if (timeLeft < 0) timeLeft = 0;
+        
         timerBar.style.width = timeLeft + "%";
 
-        if(timeLeft < 40) timerBar.style.backgroundColor = "#ffaa00";
-        if(timeLeft < 20) timerBar.style.backgroundColor = "#ff0000";
+        if(timeLeft < 50) timerBar.style.backgroundColor = "#ffaa00";
+        if(timeLeft < 25) timerBar.style.backgroundColor = "#ff0000";
 
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            triggerTimeoutScreamer();
+            executeScreamer("ВРЕМЯ ИСТЕКЛО! Твоя медлительность позволила подражателю выбить защитную дверь шлюза!");
         }
-    }, 100);
-}
-
-function triggerTimeoutScreamer() {
-    executeScreamer("ВРЕМЯ ИСТЕКЛО! Медлительность позволила существу взломать замок шлюза снаружи!");
+    }, 50);
 }
 
 function nextVisitor() {
@@ -395,22 +458,27 @@ function nextVisitor() {
         livesText.innerText = "★★★";
         gameOver = false;
         overlay.style.display = "none";
-        screamerImg.style.display = "none";
+        screamerSvg.style.display = "none";
         overlay.classList.remove('screamer-active');
     }
     
+    // Сброс стилей монитора
     monitor.style.backgroundColor = "#111";
     monitor.style.color = "#00ff00";
+    
+    // Включаем основные кнопки управления
     btnAllow.style.display = "inline-block";
+    btnAllow.disabled = false;
     btnAlarm.style.display = "inline-block";
+    btnAlarm.disabled = false;
     btnNext.style.display = "none";
 
-    // Адаптивная сложность: чем больше очков, тем выше шанс монстра (до 80%)
-    let monsterChance = Math.min(0.8, 0.4 + (score * 0.04));
+    // Шанс спавна монстра растет с уровнем счета
+    let monsterChance = Math.min(0.75, 0.35 + (score * 0.05));
     if (Math.random() < monsterChance) {
         currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
     } else {
-        currentVisitor = generateRandomHuman();
+        currentVisitor = humans[Math.floor(Math.random() * humans.length)];
     }
 
     renderVisitor();
@@ -419,38 +487,44 @@ function nextVisitor() {
 
 function renderVisitor() {
     monitorContent.innerHTML = `
-        <div class="stat-line" style="color:#ff0000; font-weight:bold;">[СКАНИРОВАНИЕ ОБЪЕКТА...]</div>
+        <div class="stat-line" style="color:#ff0000; font-weight:bold;">[ПРОТОКОЛ СКАНИРОВАНИЯ ОБЪЕКТА]</div><br>
         <div class="stat-line"><b>Имя:</b> ${currentVisitor.name}</div>
         <div class="stat-line"><b>Глаза:</b> ${currentVisitor.eyes}</div>
         <div class="stat-line"><b>Пульс:</b> ${currentVisitor.pulse}</div>
-        <div class="stat-line anomaly-box"><b>Аномалии в файле:</b><br>>> ${currentVisitor.anomaly}</div>
+        <div class="stat-line anomaly-box"><b>Аномалии в структуре файла:</b><br>>> ${currentVisitor.anomaly}</div>
     `;
 }
 
 function executeScreamer(msg) {
     gameOver = true;
     clearInterval(timerInterval);
-    ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
-    playHumanScream(); 
     
+    // Выключаем эмбиент, прячем интерфейс
+    if (ambientGain && audioCtx) ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
+    btnAllow.style.display = "none";
+    btnAlarm.style.display = "none";
+    
+    // Включаем дикий крик и рожу
+    playRealHumanScream(); 
     overlay.style.display = "flex";
-    screamerImg.style.display = "block";
+    screamerSvg.style.display = "block";
     overlay.classList.add('screamer-active');
 
+    // Через 1.4 секунды выводим экран проигрыша
     setTimeout(() => {
         overlay.classList.remove('screamer-active');
         overlay.style.display = "none";
-        screamerImg.style.display = "none";
+        screamerSvg.style.display = "none";
         
         monitor.style.backgroundColor = "#300";
         monitor.style.color = "#fff";
         monitorContent.innerHTML = `
-            <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">КРИТИЧЕСКИЙ СБОЙ СИСТЕМЫ</div><br>
-            <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000;"><b>ПЛОХАЯ КОНЦОВКА:</b> ${msg}</div>
+            <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">СИСТЕМА УНИЧТОЖЕНА</div><br>
+            <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000;"><b>ПЛОХАЯ КОНЦОВКА:</b><br>${msg}</div>
         `;
-        btnNext.innerText = "ПЕРЕЗАГРУЗИТЬ СЕРВЕР ИГРЫ";
+        btnNext.innerText = "ПЕРЕЗАГРУЗИТЬ СЕРВЕР ТЕРМИНАЛА";
         btnNext.style.display = "block";
-    }, 1300);
+    }, 1400);
 }
 
 function updateLives() {
@@ -462,7 +536,7 @@ function updateLives() {
     livesText.innerText = stars;
 
     if (lives <= 0) {
-        executeScreamer("Слишком много ошибок в отчётах. Защитный периметр полностью разрушен подражателями!");
+        executeScreamer("Вы допустили слишком много критических ошибок в отчетах. Пост полностью захвачен тварями!");
         return true;
     }
     return false;
@@ -471,6 +545,8 @@ function updateLives() {
 function allowEntry() {
     if (isPaused || gameOver) return;
     clearInterval(timerInterval);
+    
+    // МГНОВЕННО прячем кнопки, чтобы исключить баги двойного клика
     btnAllow.style.display = "none";
     btnAlarm.style.display = "none";
     
@@ -480,7 +556,8 @@ function allowEntry() {
         score++;
         scoreText.innerText = score;
         monitor.style.backgroundColor = "#002200";
-        monitorContent.innerHTML = `<br><div class="stat-line" style="text-align:center; font-size: 18px; color:#00ff00;">Объект допущен. Чистый гражданин.</div>`;
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color:#00ff00; font-weight:bold;">ОБЪЕКТ ПРОПУЩЕН.<br>Гражданин в безопасности.</div>`;
+        btnNext.innerText = "ЗАГРУЗИТЬ СЛЕДУЮЩИЙ ОБЪЕКТ";
         btnNext.style.display = "block";
     }
 }
@@ -488,6 +565,8 @@ function allowEntry() {
 function triggerAlarm() {
     if (isPaused || gameOver) return;
     clearInterval(timerInterval);
+    
+    // МГНОВЕННО прячем кнопки
     btnAllow.style.display = "none";
     btnAlarm.style.display = "none";
 
@@ -495,12 +574,16 @@ function triggerAlarm() {
         score++;
         scoreText.innerText = score;
         monitor.style.backgroundColor = "#002200";
-        monitorContent.innerHTML = `<br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00; font-weight: bold;">УГРОЗА УНИЧТОЖЕНА.<br>Подражатель стерт из системы.</div>`;
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00; font-weight: bold;">УГРОЗА УНИЧТОЖЕНА.<br>Подражатель выжжен из шлюза.</div>`;
+        btnNext.innerText = "ЗАГРУЗИТЬ СЛЕДУЮЩИЙ ОБЪЕКТ";
         btnNext.style.display = "block";
     } else {
         monitor.style.backgroundColor = "#332200";
-        monitorContent.innerHTML = `<br><div class="stat-line" style="text-align:center; font-size: 18px; color:#ffaa00;">ОШИБКА! Вы ликвидировали мирного гражданина!</div>`;
+        monitor.style.color = "#ffaa00";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; font-weight: bold;">ОШИБКА ДЕПАРТАМЕНТА!<br>Вы ликвидировали невиновного человека. Списан штраф.</div>`;
+        
         if (!updateLives()) {
+            btnNext.innerText = "ЗАГРУЗИТЬ СЛЕДУЮЩИЙ ОБЪЕКТ";
             btnNext.style.display = "block";
         }
     }
@@ -508,17 +591,27 @@ function triggerAlarm() {
 
 function togglePause() {
     if (gameOver || !audioStarted) return;
+    
     isPaused = !isPaused;
+    
     if (isPaused) {
-        ambientGain.gain.setValueAtTime(0, audioCtx.currentTime);
-        monitorContent.innerHTML = `<div style="text-align:center; font-size: 22px; padding-top:40px; color:#ff9900;">СИСТЕМА НА ПАУЗЕ</div>`;
+        clearInterval(timerInterval);
+        if (ambientGain && audioCtx) ambientGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        
+        // Замораживаем интерфейс, прячем рабочие кнопки
+        monitorContent.innerHTML = `<div style="text-align:center; font-size: 22px; padding-top:50px; color:#ff9900; font-weight:bold; letter-spacing:2px;">СИСТЕМА НА ПАУЗЕ</div>`;
         btnAllow.style.display = "none";
         btnAlarm.style.display = "none";
+        document.getElementById('pause-btn').innerText = "ПРОДОЛЖИТЬ";
     } else {
-        ambientGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        if (ambientGain && audioCtx) ambientGain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+        document.getElementById('pause-btn').innerText = "ПАУЗА";
+        
+        // Возвращаем кнопки и данные
         btnAllow.style.display = "inline-block";
         btnAlarm.style.display = "inline-block";
         renderVisitor();
+        startTimer(); // Возобновляем таймер с текущего момента
     }
 }
 </script>
