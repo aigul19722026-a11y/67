@@ -113,7 +113,7 @@
         }
         #btn-next:hover { background-color: #444; }
 
-        /* ЭКРАН СКРИМЕРА НА ВЕСЬ БРАУЗЕР */
+        /* ПОЛНОЭКРАННЫЙ СЛОЙ ДЛЯ ФОТО-СКРИМЕРА */
         #screamer-overlay {
             display: none;
             position: fixed;
@@ -125,47 +125,58 @@
             z-index: 9999;
             justify-content: center;
             align-items: center;
-            color: #ff0000;
-            font-weight: bold;
             overflow: hidden;
         }
 
-        .screamer-face {
-            font-size: 10px;
-            line-height: 1.0;
-            white-space: pre;
-            text-align: center;
-            font-family: monospace;
-            text-shadow: 0 0 25px #ff0000;
+        #screamer-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
         }
 
-        /* УЛЬТРА-ТРЯСКА И ЗУМ ДЛЯ КРИКА ДМИТРИЯ */
-        .screamer-shake {
-            animation: hard-shake 0.03s infinite, flash-red 0.06s infinite, face-zoom 1.0s forwards;
+        /* Анимация дикой тряски и глитча картинки */
+        .screamer-active {
+            animation: hard-shake 0.02s infinite, flash-screen 0.05s infinite, zoom-in 0.8s forwards;
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(15px, 12px) rotate(2deg); }
-            50% { transform: translate(-15px, -12px) rotate(-2deg); }
-            100% { transform: translate(12px, -15px) rotate(0deg); }
+            0% { transform: translate(20px, 15px) scale(1.1); filter: hue-rotate(0deg) contrast(2); }
+            50% { transform: translate(-20px, -15px) scale(0.95); filter: hue-rotate(180deg) invert(1); }
+            100% { transform: translate(15px, -20px) scale(1.15); filter: hue-rotate(360deg) contrast(3); }
         }
 
-        @keyframes flash-red {
-            0%, 100% { color: #ff0000; background-color: #020000; }
-            50% { color: #ffffff; background-color: #700; }
+        @keyframes flash-screen {
+            0%, 100% { background-color: #000; }
+            50% { background-color: #300; }
         }
 
-        @keyframes face-zoom {
-            0% { transform: scale(0.5); }
-            40% { transform: scale(1.8); }
-            100% { transform: scale(4.0); } /* Лицо буквально разрывает экран */
+        @keyframes zoom-in {
+            0% { transform: scale(0.8); }
+            100% { transform: scale(1.6); }
         }
     </style>
 </head>
 <body>
 
+<!-- Слой скримера с реальной картинкой -->
 <div id="screamer-overlay">
-    <div id="screamer-art" class="screamer-face"></div>
+    <!-- Встроенное жуткое контрастное лицо в формате SVG (не требует загрузки внешних файлов) -->
+    <svg id="screamer-image" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="black"/>
+        <circle cx="100" cy="95" r="55" fill="#111"/>
+        <!-- Пустые вырезанные глазницы -->
+        <ellipse cx="75" cy="85" rx="16" ry="22" fill="white"/>
+        <ellipse cx="125" cy="85" rx="16" ry="22" fill="white"/>
+        <circle cx="75" cy="85" r="5" fill="black"/>
+        <circle cx="125" cy="85" r="5" fill="black"/>
+        <!-- Огромный деформированный орущий рот -->
+        <ellipse cx="100" cy="140" rx="25" ry="35" fill="white"/>
+        <ellipse cx="100" cy="140" rx="21" ry="30" fill="black"/>
+        <!-- Текстура шума и искажений -->
+        <path d="M 10,10 L 190,190 M 10,190 L 190,10" stroke="red" stroke-width="0.5" opacity="0.3"/>
+        <path d="M 50,20 L 50,180 M 150,20 L 150,180" stroke="white" stroke-width="0.5" opacity="0.2"/>
+    </svg>
 </div>
 
 <div id="game-container">
@@ -194,24 +205,6 @@ const humanAnomalies = [
     "Нет. Потерял ключи от дома, просится погреться."
 ];
 
-// ХОРРОР ASCII ИСКАЖЕННОЕ ЛИЦО ДЛЯ ТКСТ ДМИТРИЯ С ПУСТЫМИ ГЛАЗНИЦАМИ
-const faceDmitriyCopy = `
-       .XXXXXXXXXXXXX.
-     .XXXXXXXXXXXXXXXXX.
-    XXXXXXXXXXXXXXXXXXXXX
-   XXXXX  [ ]     [ ]  XXXXX
-  XXXXX   |X|     |X|   XXXXX
- XXXXXX   |_|     |_|   XXXXX
- XXXXXXXXXXXXXXXXXXXXXXXXXXX
- XXXXXXX  XXXXXXXXXXX  XXXXX
-  XXXXXX  XXXXXXXXXXX  XXXXX
-   XXXXX               XXXXX
-    XXXXX  | | | | |  XXXXX
-     XXXXX | | | | | XXXXX
-       'XXXXXXXXXXXXX'
-          |||||||||
-`;
-
 const monsters = [
     { 
         name: "txt.Dmitriy.copy", 
@@ -219,8 +212,7 @@ const monsters = [
         pulse: "⚠️ ОШИБКА ЯДРА СЕРВЕРА (-1)", 
         anomaly: "Возраст по базе данных: 12930897 лет. Файл поврежден. Вместо лица — статичные помехи, система сканирования критически перегружена при попытке распознать этот объект.", 
         isMonster: true, 
-        scaryMsg: "Файл txt.Dmitriy.copy полностью стирает вашу личность из базы данных. Из монитора вырывается бесконечный поток битых системных пикселей, утаскивая вас в пустоту кода... ЕМУ 12930897 ЛЕТ, ЕГО НЕЛЬЗЯ БЫЛО ВПУСКАТЬ!", 
-        face: faceDmitriyCopy 
+        scaryMsg: "Файл txt.Dmitriy.copy полностью стирает вашу личность из базы данных. Из монитора вырывается бесконечный поток битых системных пикселей, утаскивая вас в пустоту кода... ЕМУ 12930897 ЛЕТ, ЕГО НЕЛЬЗЯ БЫЛО ВПУСКАТЬ!" 
     },
     { 
         name: "Михаил", 
@@ -228,8 +220,7 @@ const monsters = [
         pulse: "0 уд/мин", 
         anomaly: "Кожа бледная, а улыбка подозрительно широкая и неподвижная.", 
         isMonster: true, 
-        scaryMsg: "Михаил резко удлиняет челюсть до пола, издает дикий вопль и разрывает вас на части прямо через разбитое стекло!", 
-        face: faceDmitriyCopy 
+        scaryMsg: "Михаил резко удлиняет челюсть до пола, издает дикий вопль и разрывает вас на части прямо через разбитое стекло!" 
     },
     { 
         name: "Неизвестный", 
@@ -237,8 +228,7 @@ const monsters = [
         pulse: "Ошибка прибора", 
         anomaly: "Вместо ответов издает непрерывный хруст ломающихся костей.", 
         isMonster: true, 
-        scaryMsg: "Из пустых глазниц твари вырываются десятки черных щупалец, превращая вас в кровавое месиво...", 
-        face: faceDmitriyCopy 
+        scaryMsg: "Из пустых глазниц твари вырываются десятки черных щупалец, превращая вас в кровавое месиво..." 
     }
 ];
 
@@ -274,45 +264,65 @@ function initAudio() {
     audioStarted = true;
 }
 
-function playScreamerSound() {
+// РЕАЛИСТИЧНЫЙ СИНТЕЗИРОВАННЫЙ КРИК ЧЕЛОВЕКА С МОДУЛЯЦИЕЙ ЧАСТОТЫ И ХРИПОМ
+function playHumanScream() {
     if (!audioCtx) return;
-    let bufferSize = audioCtx.sampleRate * 1.5; 
-    let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+
+    let duration = 1.3; // Длительность крика
+    let sampleRate = audioCtx.sampleRate;
+    let bufferSize = sampleRate * duration;
+    let buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
     let data = buffer.getChannelData(0);
+
+    // Генерируем сложную основу крика: смесь белого шума и жесткого треска для хрипа
     for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1; 
+        let t = i / sampleRate;
+        let noise = Math.random() * 2 - 1;
+        // Модулируемый хрип голосовых связок
+        let vocalChord = Math.sin(2 * Math.PI * 180 * t + Math.sin(2 * Math.PI * 40 * t) * 3);
+        data[i] = (vocalChord * 0.4) + (noise * 0.6);
     }
 
-    let noise = audioCtx.createBufferSource();
-    noise.buffer = buffer;
+    let screamSource = audioCtx.createBufferSource();
+    screamSource.buffer = buffer;
 
-    let noiseFilter = audioCtx.createBiquadFilter();
-    noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(900, audioCtx.currentTime);
-    noiseFilter.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 1.5);
+    // Главный частотный фильтр, имитирующий зажатый истошный вопль в замкнутом пространстве
+    let screamFilter = audioCtx.createBiquadFilter();
+    screamFilter.type = 'bandpass';
+    screamFilter.Q.setValueAtTime(4, audioCtx.currentTime);
+    screamFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+    // Крик падает по частоте к концу, как при угасании сил
+    screamFilter.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + duration);
 
-    let noiseGain = audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(1.0, audioCtx.currentTime); // Максимальный уровень звука!
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
+    // Дополнительный искажающий фильтр (Дисторшн) для эффекта перегрузки динамиков терминала
+    let distortion = audioCtx.createWaveShaper();
+    function makeDistortionCurve(amount) {
+        let k = typeof amount === 'number' ? amount : 50,
+            n_samples = 44100,
+            curve = new Float32Array(n_samples),
+            deg = Math.PI / 180,
+            i = 0,
+            x;
+        for ( ; i < n_samples; ++i ) {
+            x = (i * 2) / n_samples - 1;
+            curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
+        }
+        return curve;
+    }
+    distortion.curve = makeDistortionCurve(100);
+    distortion.oversample = '4x';
 
-    let bassOsc = audioCtx.createOscillator();
-    bassOsc.type = 'sawtooth'; 
-    bassOsc.frequency.setValueAtTime(130, audioCtx.currentTime);
-    bassOsc.frequency.linearRampToValueAtTime(20, audioCtx.currentTime + 1.0);
-    
-    let bassGain = audioCtx.createGain();
-    bassGain.gain.setValueAtTime(1.0, audioCtx.currentTime);
-    bassGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
+    let screamGain = audioCtx.createGain();
+    screamGain.gain.setValueAtTime(1.2, audioCtx.currentTime); // Максимально громкий крик
+    screamGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
 
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
-    noiseGain.connect(audioCtx.destination);
+    // Подключаем цепочку эффектов
+    screamSource.connect(screamFilter);
+    screamFilter.connect(distortion);
+    distortion.connect(screamGain);
+    screamGain.connect(audioCtx.destination);
 
-    bassOsc.connect(bassGain);
-    bassGain.connect(audioCtx.destination);
-
-    noise.start();
-    bassOsc.start();
+    screamSource.start();
 }
 
 const monitor = document.getElementById('monitor');
@@ -321,9 +331,8 @@ const scoreText = document.getElementById('score');
 const btnAllow = document.getElementById('btn-allow');
 const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
-const container = document.getElementById('game-container');
 const overlay = document.getElementById('screamer-overlay');
-const screamerArt = document.getElementById('screamer-art');
+const screamerImg = document.getElementById('screamer-image');
 
 document.body.addEventListener('click', function() {
     if (!audioStarted) {
@@ -357,7 +366,7 @@ function generateRandomHuman() {
         eyes: humanEyes[Math.floor(Math.random() * humanEyes.length)],
         pulse: Math.floor(Math.random() * (88 - 65 + 1)) + 65 + " уд/мин",
         anomaly: humanAnomalies[Math.floor(Math.random() * humanAnomalies.length)],
-        isMonster: false, scaryMsg: "", face: ""
+        isMonster: false, scaryMsg: ""
     };
 }
 
@@ -367,7 +376,8 @@ function nextVisitor() {
         scoreText.innerText = score;
         gameOver = false;
         overlay.style.display = "none";
-        overlay.classList.remove('screamer-shake');
+        screamerImg.style.display = "none";
+        overlay.classList.remove('screamer-active');
     }
     
     monitor.style.backgroundColor = "#1a1a1a";
@@ -376,7 +386,7 @@ function nextVisitor() {
     btnAlarm.style.display = "inline-block";
     btnNext.style.display = "none";
 
-    if (Math.random() < 0.6) { // Чуть увеличил шанс выпадения монстров для теста
+    if (Math.random() < 0.5) {
         currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
     } else {
         currentVisitor = generateRandomHuman();
@@ -387,7 +397,7 @@ function nextVisitor() {
 
 function renderVisitor() {
     monitorContent.innerHTML = `
-        <div class="stat-line"><b>=== КРИТИЧЕСКАЯ ОШИБКА ДАННЫХ ===</b></div><br>
+        <div class="stat-line"><b>=== МОНИТОР СКАНИРОВАНИЯ ОКП ===</b></div><br>
         <div class="stat-line"><b>Имя по документам:</b> <span style="color:#ff0000; font-weight:bold;">${currentVisitor.name}</span></div>
         <div class="stat-line"><b>Глаза:</b> ${currentVisitor.eyes}</div>
         <div class="stat-line"><b>Пульс:</b> ${currentVisitor.pulse}</div>
@@ -403,28 +413,31 @@ function allowEntry() {
     if (currentVisitor.isMonster) {
         gameOver = true;
         ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
-        playScreamerSound(); 
         
-        // Включаем жуткое безглазое лицо на весь экран
-        screamerArt.innerText = currentVisitor.face;
+        // ЗАПУСКАЕМ ЖУТКИЙ КРИК ЧЕЛОВЕКА
+        playHumanScream(); 
+        
+        // Выводим скрытое лицо на весь экран с дикими эффектами глитча
         overlay.style.display = "flex";
-        overlay.classList.add('screamer-shake');
+        screamerImg.style.display = "block";
+        overlay.classList.add('screamer-active');
 
-        // Тряска и зум длятся 1 секунду, затем выводится отчет о смерти
+        // Через 1.2 секунды возвращаем игрока в меню отчета
         setTimeout(() => {
-            overlay.classList.remove('screamer-shake');
+            overlay.classList.remove('screamer-active');
             overlay.style.display = "none";
+            screamerImg.style.display = "none";
             
             monitor.style.backgroundColor = "#400";
             monitor.style.color = "#fff";
             monitorContent.innerHTML = `
                 <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">ОБЪЕКТ ПРОНИК В БУНКЕР!</div><br>
-                <div class="stat-line">Вы впустили поврежденный файл...</div><br>
+                <div class="stat-line">Вы открыли шлюз для подражателя...</div><br>
                 <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000;"><b>ОТЧЕТ ОБ АННИГИЛЯЦИИ:</b> ${currentVisitor.scaryMsg}</div>
             `;
-            btnNext.innerText = "ПЕРЕЗАГРУЗИТЬ СЕРВЕР";
+            btnNext.innerText = "ПЕРЕЗАГРУЗИТЬ СЕРВЕР ИГРЫ";
             btnNext.style.display = "block";
-        }, 1000);
+        }, 1200);
 
     } else {
         score++;
