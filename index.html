@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ОКП: Отдел Контроля Подражателей - ANALOG HORROR</title>
+    <title>ОКП: Отдел Контроля Подражателей - ANALOG HORROR v3.0</title>
     <style>
         body {
             background-color: #020202;
@@ -31,7 +31,6 @@
             overflow: hidden;
         }
 
-        /* Сканирующие полосы телика */
         .crt-screen::before {
             content: " ";
             display: block;
@@ -43,7 +42,6 @@
             pointer-events: none;
         }
 
-        /* Легкое мерцание старого люминофора */
         .crt-flicker {
             animation: crt-glow 0.15s infinite;
         }
@@ -139,7 +137,6 @@
             margin-top: 20px;
         }
 
-        /* ТАКТИЛЬНЫЕ КНОПКИ С АНИМАЦИЕЙ НАЖАТИЯ */
         button.game-btn {
             font-family: 'Courier New', Courier, monospace;
             font-size: 15px;
@@ -150,7 +147,6 @@
             border-radius: 6px;
             color: white;
             transition: transform 0.05s, box-shadow 0.05s;
-            position: relative;
         }
 
         button.game-btn:active {
@@ -162,19 +158,11 @@
             border-color: #00ff00;
             box-shadow: 0 4px 0 #003300, 0 0 10px rgba(0,255,0,0.3); 
         }
-        #btn-allow:active {
-            box-shadow: 0 1px 0 #003300;
-        }
-
         #btn-alarm { 
             background-color: #550000; 
             border-color: #ff0000;
             box-shadow: 0 4px 0 #330000, 0 0 10px rgba(255,0,0,0.3); 
         }
-        #btn-alarm:active {
-            box-shadow: 0 1px 0 #330000;
-        }
-
         #btn-next {
             background-color: #222;
             margin-top: 15px;
@@ -182,7 +170,7 @@
             border: 1px solid #555;
         }
 
-        /* ПОЛНОЭКРАННЫЙ СКРИМЕР */
+        /* ПОЛНОЭКРАННЫЙ СКРИМЕР С РЕАЛЬНОЙ РОЖЕЙ ИЗ СЕТИ */
         #screamer-overlay {
             display: none;
             position: fixed;
@@ -193,58 +181,44 @@
             overflow: hidden;
         }
 
-        #screamer-svg {
-            width: 100%; height: 100%;
-            max-width: 800px; max-height: 800px;
+        #screamer-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
             display: none;
         }
 
         .screamer-active {
-            animation: hard-shake 0.015s infinite, flash-screen 0.03s infinite, zoom-in 0.5s forwards;
+            animation: hard-shake 0.015s infinite, flash-screen 0.03s infinite, zoom-in 0.4s forwards;
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(25px, 20px) scale(1.3); filter: contrast(3) brightness(1.4); }
-            50% { transform: translate(-25px, -20px) scale(0.95) invert(1); filter: hue-rotate(180deg); }
-            100% { transform: translate(20px, -25px) scale(1.4); filter: contrast(4) saturate(3); }
+            0% { transform: translate(20px, 15px) scale(1.1); filter: contrast(2.5) brightness(1.3); }
+            50% { transform: translate(-20px, -15px) scale(0.98) invert(1); filter: hue-rotate(90deg); }
+            100% { transform: translate(15px, -20px) scale(1.15); filter: contrast(3); }
         }
 
         @keyframes flash-screen {
             0%, 100% { background-color: #000; }
-            50% { background-color: #2a0000; }
+            50% { background-color: #1a0000; }
         }
 
         @keyframes zoom-in {
-            0% { transform: scale(0.6); }
-            100% { transform: scale(2.3); }
+            0% { transform: scale(1.0); }
+            100% { transform: scale(1.8); }
         }
     </style>
 </head>
 <body>
 
+<!-- Аудио-элементы для подгрузки реальных звуков из интернета -->
+<audio id="snd-click" src="https://actions.google.com/sounds/v1/interfaces/simple_click.ogg" preload="auto"></audio>
+<audio id="snd-shot" src="https://assets.mixkit.co/active_storage/sfx/2890/2890-84.wav" preload="auto"></audio>
+<audio id="snd-scream" src="https://assets.mixkit.co/active_storage/sfx/953/953-84.wav" preload="auto"></audio>
+
 <div id="screamer-overlay">
-    <svg id="screamer-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect width="200" height="200" fill="#000000"/>
-        <path d="M 50,70 C 45,30 155,25 150,70 C 145,110 135,165 100,175 C 65,165 55,110 50,70 Z" fill="#181818" stroke="#050505" stroke-width="2"/>
-        <path d="M 62,75 Q 75,55 88,72 Q 82,95 65,90 Z" fill="#ffffff"/>
-        <path d="M 68,78 Q 74,65 82,76 Q 78,88 70,85 Z" fill="#000000"/>
-        <circle cx="74" cy="78" r="3" fill="#ffffff" opacity="0.8"/>
-        <path d="M 112,78 Q 128,62 142,82 Q 132,108 115,98 Z" fill="#ffffff"/>
-        <path d="M 118,82 Q 126,72 134,85 Q 128,96 121,92 Z" fill="#000000"/>
-        <circle cx="124" cy="84" r="2" fill="#ffffff" opacity="0.8"/>
-        <path d="M 65,90 L 62,115 L 72,100 L 78,125 L 85,92 Z" fill="#050505" opacity="0.8"/>
-        <path d="M 115,98 L 118,130 L 126,110 L 132,135 L 138,92 Z" fill="#050505" opacity="0.8"/>
-        <path d="M 70,130 Q 100,110 130,128 Q 145,165 100,185 Q 55,160 70,130 Z" fill="#ffffff"/>
-        <path d="M 75,134 Q 100,118 125,132 Q 135,160 100,178 Q 65,155 75,134 Z" fill="#000000"/>
-        <polygon points="80,135 83,145 86,135" fill="#dddddd"/>
-        <polygon points="90,134 94,148 98,135" fill="#dddddd"/>
-        <polygon points="102,135 106,149 110,136" fill="#dddddd"/>
-        <polygon points="114,134 118,144 122,135" fill="#dddddd"/>
-        <polygon points="82,156 86,146 90,155" fill="#dddddd"/>
-        <polygon points="96,162 100,148 104,160" fill="#dddddd"/>
-        <polygon points="110,158 113,147 117,155" fill="#dddddd"/>
-        <path d="M 5,25 L 195,175 M 10,160 L 185,45" stroke="#ff0000" stroke-width="0.8" opacity="0.3"/>
-    </svg>
+    <!-- Реальное жуткое глитч-лицо из сети -->
+    <img id="screamer-img" src="https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1000&auto=format&fit=crop" alt="PROCESS_ERR">
 </div>
 
 <div class="crt-screen crt-flicker">
@@ -307,7 +281,7 @@ const monsters = [
         pulse: "14 уд/мин (сбои)", 
         anomaly: "ХАРДКОР: Под одеждой прощупываются множественные суставчатые конечности насекомого.", 
         isMonster: true, 
-        scaryMsg: "Из Святослава вырвался гигантский инсектоид, отложив личинки прямо в системы охлаждения терминала." 
+        scaryMsg: "Из Святослава вырвался гигантский инсектоид, уничтожив системы охлаждения терминала." 
     },
     { 
         name: "Анна", 
@@ -315,7 +289,7 @@ const monsters = [
         pulse: "145 уд/мин", 
         anomaly: "ХАРДКОР: Сканер ДНК выявил, что объект состоит из биомассы 4 разных людей. Документы чистые.", 
         isMonster: true, 
-        scaryMsg: "Морф Анна разделился на четыре части прямо внутри бункера, устроив резню на нижних этажах." 
+        scaryMsg: "Морф Анна разделился на четыре части прямо внутри бункера, устроив резню на этажах." 
     }
 ];
 
@@ -347,7 +321,7 @@ function initAudio() {
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(80, audioCtx.currentTime);
 
-        ambientGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        ambientGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         
         ambientOsc.connect(filter);
         filter.connect(ambientGain);
@@ -355,106 +329,6 @@ function initAudio() {
         ambientOsc.start();
         audioStarted = true;
     } catch(e) { console.log(e); }
-}
-
-// ЗВУК ГАЛОЧКИ (ЗЕЛЕНЫЙ КЛИК)
-function playCheckmarkSound() {
-    if (!audioCtx) return;
-    let osc = audioCtx.createOscillator();
-    let gain = audioCtx.createGain();
-    
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(550, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
-    
-    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
-    
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.15);
-}
-
-// РЕАЛИСТИЧНЫЙ СИНТЕЗИРОВАННЫЙ ВЫСТРЕЛ ИЗ ДРОБОВИКА С ЭХОМ
-function playShotgunSound() {
-    if (!audioCtx) return;
-    let duration = 0.8;
-    let sampleRate = audioCtx.sampleRate;
-    let bufferSize = sampleRate * duration;
-    let buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
-    let data = buffer.getChannelData(0);
-
-    for (let i = 0; i < bufferSize; i++) {
-        let t = i / sampleRate;
-        let noise = Math.random() * 2 - 1;
-        // Хлёсткий взрывной импульс, переходящий в низкочастотный гул (эхо)
-        let explosion = Math.exp(-9 * t); 
-        data[i] = noise * explosion;
-    }
-
-    let noiseNode = audioCtx.createBufferSource();
-    noiseNode.buffer = buffer;
-
-    let filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
-    filter.frequency.linearRampToValueAtTime(200, audioCtx.currentTime + duration);
-
-    let gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(1.8, audioCtx.currentTime); // Очень мощно
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-
-    noiseNode.connect(filter);
-    filter.connect(gain);
-    gain.connect(audioCtx.destination);
-    noiseNode.start();
-}
-
-// ЧЕЛОвеЧЕСКИЙ ИСТОШНЫЙ КРИК (ДЛЯ СКРИМЕРА)
-function playRealHumanScream() {
-    if (!audioCtx) return;
-    let duration = 1.5;
-    let sampleRate = audioCtx.sampleRate;
-    let bufferSize = sampleRate * duration;
-    let buffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
-    let data = buffer.getChannelData(0);
-
-    for (let i = 0; i < bufferSize; i++) {
-        let t = i / sampleRate;
-        let noise = Math.random() * 2 - 1;
-        let freqMod = 280 + (t * 750) + Math.sin(2 * Math.PI * 65 * t) * 140;
-        let vocalWave = Math.sin(2 * Math.PI * freqMod * t);
-        let throatDistortion = Math.sin(2 * Math.PI * 50 * t);
-        data[i] = (vocalWave * 0.3) + (noise * 0.6) + (throatDistortion * 0.1);
-    }
-
-    let source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-
-    let filter = audioCtx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.Q.setValueAtTime(3.5, audioCtx.currentTime);
-    filter.frequency.setValueAtTime(1400, audioCtx.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + duration);
-
-    let distortion = audioCtx.createWaveShaper();
-    let curve = new Float32Array(44100);
-    for (let i=0; i<44100; ++i) {
-        let x = (i * 2) / 44100 - 1;
-        curve[i] = (3 + 220) * x * 15 * (Math.PI/180) / (Math.PI + 220 * Math.abs(x));
-    }
-    distortion.curve = curve;
-
-    let gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(1.6, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-
-    source.connect(filter);
-    filter.connect(distortion);
-    distortion.connect(gain);
-    gain.connect(audioCtx.destination);
-    source.start();
 }
 
 const monitor = document.getElementById('monitor');
@@ -466,7 +340,7 @@ const btnAllow = document.getElementById('btn-allow');
 const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
 const overlay = document.getElementById('screamer-overlay');
-const screamerSvg = document.getElementById('screamer-svg');
+const screamerImg = document.getElementById('screamer-img');
 
 function startGame() {
     if (!audioStarted) {
@@ -508,7 +382,7 @@ function nextVisitor() {
         livesText.innerText = "★★★";
         gameOver = false;
         overlay.style.display = "none";
-        screamerSvg.style.display = "none";
+        screamerImg.style.display = "none";
         overlay.classList.remove('screamer-active');
     }
     
@@ -549,15 +423,18 @@ function executeScreamer(msg) {
     btnAllow.style.display = "none";
     btnAlarm.style.display = "none";
     
-    playRealHumanScream(); 
+    // Включаем РЕАЛЬНЫЙ крик и картинку
+    document.getElementById('snd-scream').currentTime = 0;
+    document.getElementById('snd-scream').play().catch(e => console.log(e));
+    
     overlay.style.display = "flex";
-    screamerSvg.style.display = "block";
+    screamerImg.style.display = "block";
     overlay.classList.add('screamer-active');
 
     setTimeout(() => {
         overlay.classList.remove('screamer-active');
         overlay.style.display = "none";
-        screamerSvg.style.display = "none";
+        screamerImg.style.display = "none";
         
         monitor.style.backgroundColor = "#2a0000";
         monitor.style.color = "#fff";
@@ -567,7 +444,7 @@ function executeScreamer(msg) {
         `;
         btnNext.innerText = "ПЕРЕЗАГРУЗИТЬ КИНЕСКОП ТЕРМИНАЛА";
         btnNext.style.display = "block";
-    }, 1450);
+    }, 1500);
 }
 
 function updateLives() {
@@ -592,8 +469,10 @@ function allowEntry() {
     btnAllow.style.display = "none";
     btnAlarm.style.display = "none";
     
-    // ЭФФЕКТ ГАЛОЧКИ: звук + короткая зеленая вспышка кинескопа
-    playCheckmarkSound();
+    // Проигрываем РЕАЛЬНЫЙ звук клика/галочки
+    document.getElementById('snd-click').currentTime = 0;
+    document.getElementById('snd-click').play().catch(e => console.log(e));
+    
     monitor.style.backgroundColor = "#003300";
     
     setTimeout(() => {
@@ -617,8 +496,10 @@ function triggerAlarm() {
     btnAllow.style.display = "none";
     btnAlarm.style.display = "none";
 
-    // ЭФФЕКТ ВЫСТРEЛА: Экран гаснет, играет громкий выстрел дробовика
-    playShotgunSound();
+    // Проигрываем НАСТОЯЩИЙ выстрел дробовика
+    document.getElementById('snd-shot').currentTime = 0;
+    document.getElementById('snd-shot').play().catch(e => console.log(e));
+    
     monitor.style.opacity = "0";
     monitor.style.backgroundColor = "#000000";
 
@@ -642,7 +523,7 @@ function triggerAlarm() {
                 btnNext.style.display = "block";
             }
         }
-    }, 350); // Небольшая задержка темноты после выстрела
+    }, 450); 
 }
 
 function togglePause() {
@@ -657,7 +538,7 @@ function togglePause() {
         btnAlarm.style.display = "none";
         document.getElementById('pause-btn').innerText = "ПРОДОЛЖИТЬ";
     } else {
-        if (ambientGain && audioCtx) ambientGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        if (ambientGain && audioCtx) ambientGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
         document.getElementById('pause-btn').innerText = "ПАУЗА";
         btnAllow.style.display = "inline-block";
         btnAlarm.style.display = "inline-block";
