@@ -28,6 +28,7 @@
             text-align: center;
             border-radius: 8px;
             position: relative;
+            z-index: 2;
         }
 
         #pause-btn {
@@ -38,6 +39,8 @@
             padding: 5px 10px;
             font-size: 12px;
             border: 1px solid #555;
+            color: white;
+            cursor: pointer;
         }
         #pause-btn:hover { background-color: #444; }
 
@@ -110,24 +113,60 @@
         }
         #btn-next:hover { background-color: #444; }
 
-        /* Анимация жесткого визуального взрыва при скримере */
+        /* ЭКРАН СКРИМЕРА НА ВЕСЬ БРАУЗЕР */
+        #screamer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            color: #ff0000;
+            font-weight: bold;
+            overflow: hidden;
+        }
+
+        .screamer-face {
+            font-size: 14px;
+            line-height: 1.1;
+            white-space: pre;
+            text-align: center;
+            font-family: monospace;
+            text-shadow: 0 0 15px #ff0000;
+        }
+
+        /* Бешеная тряска и пульсация для скримера */
         .screamer-shake {
-            animation: hard-shake 0.05s infinite, flash-red 0.1s infinite;
+            animation: hard-shake 0.04s infinite, flash-red 0.08s infinite, face-zoom 1.2s forwards;
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(7px, 5px) scale(1.05); }
-            50% { transform: translate(-7px, -5px) scale(0.95); }
-            100% { transform: translate(5px, -7px) scale(1.03); }
+            0% { transform: translate(10px, 8px) rotate(1deg); }
+            50% { transform: translate(-10px, -8px) rotate(-1deg); }
+            100% { transform: translate(8px, -10px) rotate(0deg); }
         }
 
         @keyframes flash-red {
-            0%, 100% { background-color: #000; }
-            50% { background-color: #900; }
+            0%, 100% { color: #ff0000; background-color: #000; }
+            50% { color: #000000; background-color: #500; }
+        }
+
+        @keyframes face-zoom {
+            0% { transform: scale(0.6); }
+            100% { transform: scale(2.5); }
         }
     </style>
 </head>
 <body>
+
+<!-- Наложенный слой для скримеров -->
+<div id="screamer-overlay">
+    <div id="screamer-art" class="screamer-face"></div>
+</div>
 
 <div id="game-container">
     <button id="pause-btn" onclick="togglePause()">ПАУЗА</button>
@@ -155,12 +194,71 @@ const humanAnomalies = [
     "Нет. Потерял ключи от дома, просится погреться."
 ];
 
+// Текстовые заготовки рож монстров (ASCII Art)
+const faceMichael = `
+     .XNNNNNX.     
+    X*  .  .  *X   
+   X  (O)  (O)  X  
+  X      ||      X 
+ X       ||       X
+ X   /=========\  X
+ X  |           | X
+ X  |           | X
+  X |           |X 
+   X|___________|X 
+     VVVVVVVVVVV   
+`;
+
+const faceOlga = `
+    /XXXXXXXXX\\    
+   X  x     x  X   
+  X     ___     X  
+ X    /     \\    X 
+X    |  X X  |    X
+X     \\ ___ /    X 
+ X  W W W W W W  X 
+  X  V V V V V  X  
+   \\XXXXXXXXX/    
+`;
+
+const faceIvan = `
+     .--------.    
+    /  O  O  O \\   
+   |            |  
+   |    ____    |  
+   |   /    \\   |  
+    \\  \\____/  /   
+     '--------'    
+`;
+
+const faceUnknown = `
+     .AMMMMMA.     
+    AMMMMMMMMMA    
+   A  !!!  !!!  A  
+  A  !!!!  !!!!  A 
+  A              A 
+  A   !!!!!!!!   A 
+   A   !!!!!!   A  
+    A.        .A   
+      VMMMMMV      
+`;
+
+const faceDouble = `
+     .::::::.     
+    ::::::::::    
+   :: 🕇 :::: 🕇 ::   
+   ::::::::::::   
+   ::  ======  ::   
+    ::::::::::    
+     '::::::'     
+`;
+
 const monsters = [
-    { name: "Михаил", eyes: "Черные... без белков", pulse: "0 уд/мин", anomaly: "Кожа бледная, а улыбка подозрительно широкая и неподвижная.", isMonster: true, scaryMsg: "Михаил резко удлиняет челюсть до пола, издает дикий вопль и разрывает вас на части прямо через разбитое стекло!" },
-    { name: "Ольга", eyes: "Голубые, моргает невпопад", pulse: "240 уд/мин", anomaly: "Температура тела 12 градусов. Документы липкие и пахнут сыростью.", isMonster: true, scaryMsg: "Ольга с хрустом выворачивает суставы наизнанку, превращается в многоногую тварь и утаскивает вас в вентиляцию!" },
-    { name: "Иван", eyes: "Карие, но их ТРИ на лице", pulse: "90 уд/мин", anomaly: "Пытается натянуть кепку на лоб. Издает глухое горловое рычание.", isMonster: true, scaryMsg: "Третий глаз Ивана намертво гипнотизирует вас, пока его истинная пасть вырывает твое сердце!" },
-    { name: "Неизвестный", eyes: "Пустые темные глазницы", pulse: "Ошибка прибора", anomaly: "Вместо ответов издает непрерывный хруст ломающихся костей.", isMonster: true, scaryMsg: "Из пустых глазниц твари вырываются десятки черных щупалец, превращая вас в кровавое месиво..." },
-    { name: "Двойник", eyes: "Абсолютно копия ваших", pulse: "45 уд/мин", anomaly: "Внешность на 100% совпадает с ВАШЕЙ внешностью. Он смотрит на вас и ухмыляется.", isMonster: true, scaryMsg: "Двойник разбивает стекло, хватает вас за горло и шепчет: 'Теперь я буду сидеть на этом посту'..." }
+    { name: "Михаил", eyes: "Черные... без белков", pulse: "0 уд/мин", anomaly: "Кожа бледная, а улыбка подозрительно широкая и неподвижная.", isMonster: true, scaryMsg: "Михаил резко удлиняет челюсть до пола, издает дикий вопль и разрывает вас на части прямо через разбитое стекло!", face: faceMichael },
+    { name: "Ольга", eyes: "Голубые, моргает невпопад", pulse: "240 уд/мин", anomaly: "Температура тела 12 градусов. Документы липкие и пахнут сыростью.", isMonster: true, scaryMsg: "Ольга с хрустом выворачивает суставы наизнанку, превращается в многоногую тварь и утаскивает вас в вентиляцию!", face: faceOlga },
+    { name: "Иван", eyes: "Карие, но их ТРИ на лице", pulse: "90 уд/мин", anomaly: "Пытается натянуть кепку на лоб. Издает глухое горловое рычание.", isMonster: true, scaryMsg: "Третий глаз Ивана намертво гипнотизирует вас, пока его истинная пасть вырывает твое сердце!", face: faceIvan },
+    { name: "Неизвестный", eyes: "Пустые темные глазницы", pulse: "Ошибка прибора", anomaly: "Вместо ответов издает непрерывный хруст ломающихся костей.", isMonster: true, scaryMsg: "Из пустых глазниц твари вырываются десятки черных щупалец, превращая вас в кровавое месиво...", face: faceUnknown },
+    { name: "Двойник", eyes: "Абсолютно копия ваших", pulse: "45 уд/мин", anomaly: "Внешность на 100% совпадает с ВАШЕЙ внешностью. Он смотрит на вас и ухмыляется.", isMonster: true, scaryMsg: "Двойник разбивает стекло, хватает вас за горло и шепчет: 'Теперь я буду сидеть на этом посту'...", face: faceDouble }
 ];
 
 let score = 0;
@@ -169,7 +267,6 @@ let gameOver = false;
 let isPaused = false;
 let audioStarted = false;
 
-// Звуковой движок (Web Audio API)
 let audioCtx = null;
 let ambientOsc = null;
 let ambientGain = null;
@@ -178,13 +275,11 @@ function initAudio() {
     if (audioStarted) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
-    // Создаем мрачный низкий гул (эмбиент бункера)
     ambientOsc = audioCtx.createOscillator();
     ambientGain = audioCtx.createGain();
     ambientOsc.type = 'sawtooth'; 
-    ambientOsc.frequency.setValueAtTime(45, audioCtx.currentTime); // Очень низкая жуткая частота
+    ambientOsc.frequency.setValueAtTime(45, audioCtx.currentTime); 
     
-    // Фильтр, чтобы убрать резкость и оставить только глухой гул
     let filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(120, audioCtx.currentTime);
@@ -200,36 +295,33 @@ function initAudio() {
 
 function playScreamerSound() {
     if (!audioCtx) return;
-    // Оглушительный, разрывающий белый шум смешанный с низким частотным ударом
-    let bufferSize = audioCtx.sampleRate * 1.5; // Длительность звука 1.5 секунды
+    let bufferSize = audioCtx.sampleRate * 1.5; 
     let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     let data = buffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1; // Белый шум
+        data[i] = Math.random() * 2 - 1; 
     }
 
     let noise = audioCtx.createBufferSource();
     noise.buffer = buffer;
 
-    // Фильтр для создания эффекта "крика"
     let noiseFilter = audioCtx.createBiquadFilter();
     noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
-    noiseFilter.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 1.5);
+    noiseFilter.frequency.setValueAtTime(800, audioCtx.currentTime);
+    noiseFilter.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 1.5);
 
     let noiseGain = audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.8, audioCtx.currentTime); // Громко!
+    noiseGain.gain.setValueAtTime(0.95, audioCtx.currentTime); // Сделал громче!
     noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
 
-    // Дополнительный низкий гул для удара по ушам
     let bassOsc = audioCtx.createOscillator();
-    bassOsc.type = 'triangle';
-    bassOsc.frequency.setValueAtTime(80, audioCtx.currentTime);
-    bassOsc.frequency.linearRampToValueAtTime(20, audioCtx.currentTime + 0.5);
+    bassOsc.type = 'sawtooth'; // Смена на sawtooth для большей агрессии звука
+    bassOsc.frequency.setValueAtTime(110, audioCtx.currentTime);
+    bassOsc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.8);
     
     let bassGain = audioCtx.createGain();
     bassGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-    bassGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+    bassGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
 
     noise.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
@@ -249,8 +341,9 @@ const btnAllow = document.getElementById('btn-allow');
 const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
 const container = document.getElementById('game-container');
+const overlay = document.getElementById('screamer-overlay');
+const screamerArt = document.getElementById('screamer-art');
 
-// Первое нажатие по экрану оживляет аудиосистему
 document.body.addEventListener('click', function() {
     if (!audioStarted) {
         initAudio();
@@ -263,13 +356,13 @@ function togglePause() {
     isPaused = !isPaused;
     
     if (isPaused) {
-        ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); // Отключаем музыку
+        ambientGain.gain.setValueAtTime(0, audioCtx.currentTime);
         monitorContent.innerHTML = `<div style="text-align:center; font-size: 22px; padding-top:40px; color:#ff9900;">СИСТЕМА НА ПАУЗЕ</div>`;
         btnAllow.disabled = true;
         btnAlarm.disabled = true;
         document.getElementById('pause-btn').innerText = "ПРОДОЛЖИТЬ";
     } else {
-        ambientGain.gain.setValueAtTime(0.15, audioCtx.currentTime); // Возвращаем музыку
+        ambientGain.gain.setValueAtTime(0.15, audioCtx.currentTime);
         btnAllow.disabled = false;
         btnAlarm.disabled = false;
         document.getElementById('pause-btn').innerText = "ПАУЗА";
@@ -283,7 +376,7 @@ function generateRandomHuman() {
         eyes: humanEyes[Math.floor(Math.random() * humanEyes.length)],
         pulse: Math.floor(Math.random() * (88 - 65 + 1)) + 65 + " уд/мин",
         anomaly: humanAnomalies[Math.floor(Math.random() * humanAnomalies.length)],
-        isMonster: false, scaryMsg: ""
+        isMonster: false, scaryMsg: "", face: ""
     };
 }
 
@@ -292,7 +385,8 @@ function nextVisitor() {
         score = 0;
         scoreText.innerText = score;
         gameOver = false;
-        document.body.classList.remove('screamer-shake');
+        overlay.style.display = "none";
+        overlay.classList.remove('screamer-shake');
     }
     
     monitor.style.backgroundColor = "#1a1a1a";
@@ -327,17 +421,19 @@ function allowEntry() {
     
     if (currentVisitor.isMonster) {
         gameOver = true;
-        ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); // Глушим музыку ради скримера
-        playScreamerSound(); // БЬЕМ ПО УШАМ
+        ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
+        playScreamerSound(); 
         
-        document.body.classList.add('screamer-shake'); // Трясем всю страницу
-        monitor.style.backgroundColor = "#ff0000";
-        monitor.style.color = "#000";
-        monitorContent.innerHTML = `<div style="font-size: 50px; font-weight:bold; text-align:center; color:#000; padding-top:40px;">УМРИ!!</div>`;
+        // Показываем оверлей со страшной физиономией на весь экран
+        screamerArt.innerText = currentVisitor.face;
+        overlay.style.display = "flex";
+        overlay.classList.add('screamer-shake');
 
-        // Через 1.2 секунды тряска прекращается, и выводится ЧИТАЕМЫЙ отчет
+        // Через 1.4 секунды убираем рожу и выдаем спокойный ЧИТАЕМЫЙ отчет
         setTimeout(() => {
-            document.body.classList.remove('screamer-shake');
+            overlay.classList.remove('screamer-shake');
+            overlay.style.display = "none";
+            
             monitor.style.backgroundColor = "#400";
             monitor.style.color = "#fff";
             monitorContent.innerHTML = `
@@ -347,7 +443,7 @@ function allowEntry() {
             `;
             btnNext.innerText = "НАЧАТЬ ЗАНОВО";
             btnNext.style.display = "block";
-        }, 1200);
+        }, 1400);
 
     } else {
         score++;
