@@ -26,6 +26,7 @@
             box-shadow: 0 0 20px rgba(170, 0, 0, 0.5);
             text-align: center;
             border-radius: 8px;
+            transition: transform 0.1s ease;
         }
 
         h1 {
@@ -34,6 +35,12 @@
             margin-top: 0;
             letter-spacing: 2px;
             text-shadow: 0 0 5px rgba(170, 0, 0, 0.8);
+        }
+
+        #score-board {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
 
         #monitor {
@@ -45,7 +52,7 @@
             margin: 20px 0;
             border-radius: 5px;
             box-shadow: inset 0 0 10px #000;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .stat-line {
@@ -59,12 +66,6 @@
             margin-top: 15px;
             border-top: 1px dashed #555;
             padding-top: 10px;
-        }
-
-        #score-board {
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
         }
 
         .btn-group {
@@ -98,29 +99,30 @@
         }
         #btn-next:hover { background-color: #444; }
 
-        /* Эффект скримера */
+        /* Эффект жуткого скримера для всего экрана */
         .screamer-active {
-            animation: shake 0.1s infinite, flash 0.2s infinite;
+            animation: shake 0.1s infinite, flash 0.1s infinite;
             border-color: #ff0000 !important;
+            box-shadow: 0 0 50px #ff0000 !important;
         }
 
         @keyframes shake {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(2px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(2px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% { transform: translate(4px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -3px) rotate(-2deg); }
+            20% { transform: translate(-5px, 0px) rotate(2deg); }
+            30% { transform: translate(0px, 4px) rotate(0deg); }
+            40% { transform: translate(3px, -2px) rotate(2deg); }
+            50% { transform: translate(-2px, 3px) rotate(-2deg); }
+            60% { transform: translate(-4px, 2px) rotate(0deg); }
+            70% { transform: translate(4px, 2px) rotate(-2deg); }
+            80% { transform: translate(-2px, -2px) rotate(2deg); }
+            90% { transform: translate(3px, 3px) rotate(0deg); }
+            100% { transform: translate(2px, -3px) rotate(-2deg); }
         }
 
         @keyframes flash {
             0%, 100% { background-color: #111; }
-            50% { background-color: #400; }
+            50% { background-color: #600; }
         }
     </style>
 </head>
@@ -142,14 +144,29 @@
 </div>
 
 <script>
-const visitors = [
-    { name: "Алексей", eyes: "Карие, обычные", pulse: "75 уд/мин", anomaly: "Нет. Обычный парень, немного уставший.", isMonster: false, scaryMsg: "" },
-    { name: "Елена", eyes: "Зеленые, живые", pulse: "82 уд/мин", anomaly: "Нет. Жалуется на головную боль из-за погоды.", isMonster: false, scaryMsg: "" },
-    { name: "Михаил", eyes: "Черные... слишком черные, без белков", pulse: "0 уд/мин", anomaly: "Его кожа кажется серой, а улыбка подозрительно широкая.", isMonster: true, scaryMsg: "Михаил резко удлиняет челюсть до пола, издает оглушительный ультразвуковой вопль и перекусывает вас пополам прямо через стекло!" },
-    { name: "Ольга", eyes: "Голубые, моргает невпопад", pulse: "240 уд/мин", anomaly: "Температура тела 12 градусов. Документы пахнут могильной сыростью.", isMonster: true, scaryMsg: "Ольга с диким хрустом выворачивает суставы наизнанку, превращается в многоногую тварь и мгновенно утаскивает вас в вентиляцию!" },
-    { name: "Иван", eyes: "Карие, но их ТРИ на лице", pulse: "90 уд/мин", anomaly: "Пытается прикрыть кепкой лоб. Постоянно дергается и тихо рычит.", isMonster: true, scaryMsg: "Третий глаз Ивана на лбу открывается и намертво гипнотизирует вас, пока его истинная пасть разрывает твою грудную клетку!" },
-    { name: "Дмитрий", eyes: "Серые, испуганные", pulse: "110 уд/мин", anomaly: "Очень сильно напуган. Дрожащим голосом умоляет впустить его и спрятать от 'них'.", isMonster: false, scaryMsg: "" },
-    { name: "Неизвестный", eyes: "Отсутствуют (пустые темные глазницы)", pulse: "Не считывается", anomaly: "Вместо ответа на вопросы издает жуткий хруст ломающихся костей.", isMonster: true, scaryMsg: "Из пустых глазниц существа вырываются длинные черные щупальца, разбивая бронированное стекло вдребезги..." }
+// Списки элементов для генерации абсолютно уникальных людей
+const humanNames = ["Алексей", "Елена", "Михаил", "Ольга", "Иван", "Дмитрий", "Анна", "Сергей", "Наталья", "Артем", "Мария", "Николай", "Екатерина", "Владимир"];
+const humanEyes = ["Карие, обычные", "Зеленые, ясные", "Голубые, уставшие", "Серые, немного испуганные", "Темно-карие, заспанные", "Светло-серые, спокойные"];
+const humanAnomalies = [
+    "Нет. Обычный гражданин, возвращается со смены.",
+    "Нет. Жалуется на сильную головную боль и плохую погоду.",
+    "Нет. Очень сильно напуган слухами о подражателях, просит укрытия.",
+    "Нет. Потерял ключи от дома, просится погреться на КПП.",
+    "Нет. Обычный рабочий, показывает чистый пропуск.",
+    "Нет. Тихо напевает какую-то мелодию под нос, выглядит уставшим.",
+    "Нет. Просит стакан воды, у него трясутся руки от стресса.",
+    "Нет. Жалуется на туман на улице, требует быстрее пропустить его."
+];
+
+// Список готовых проработанных монстров
+const monsters = [
+    { name: "Михаил", eyes: "Черные... слишком черные, без белков", pulse: "0 уд/мин", anomaly: "Его кожа кажется серой, а улыбка подозрительно широкая и неподвижная.", isMonster: true, scaryMsg: "Михаил резко удлиняет челюсть до самого пола, издает оглушительный ультразвуковой вопль и разрывает вас на части прямо через разбитое стекло!" },
+    { name: "Ольга", eyes: "Голубые, моргает невпопад каждым глазом отдельно", pulse: "240 уд/мин", anomaly: "Температура тела 12 градусов. Выданные документы наощупь липкие и пахнут могильной сыростью.", isMonster: true, scaryMsg: "Ольга с диким хрустом выворачивает суставы наизнанку, превращается в огромную многоногую тварь и мгновенно утаскивает вас в вентиляционную шахту!" },
+    { name: "Иван", eyes: "Карие, но на лице отчётливо видны ТРИ глаза", pulse: "90 уд/мин", anomaly: "Судорожно пытается натянуть кепку на лоб. Постоянно дергается и издает глухое горловое рычание.", isMonster: true, scaryMsg: "Третий глаз Ивана на лбу широко открывается и намертво гипнотизирует вас, пока его истинная пасть разрывает вашу грудную клетку!" },
+    { name: "Неизвестный", eyes: "Отсутствуют (пустые, глубокие темные глазницы)", pulse: "Не считывается (ошибка прибора)", anomaly: "Вместо ответа на стандартные вопросы издает жуткий непрерывный хруст ломающихся костей.", isMonster: true, scaryMsg: "Из пустых глазниц существа вырываются десятки длинных черных щупалец, превращая бронированное стекло и вас в кровавое месиво..." },
+    { name: "Дмитрий (КОПИЯ)", eyes: "Серые, абсолютно немигающие", pulse: "45 уд/мин", anomaly: "Прибор показывает, что его внешность на 100% совпадает с ВАШЕЙ внешностью. Он смотрит на вас и ухмыляется.", isMonster: true, scaryMsg: "Ваш двойник разбивает стекло головой, хватает вас за горло и шепчет: 'Теперь я буду сидеть на этом посту'..." },
+    { name: "Анна", eyes: "Зеленые, но зрачки горизонтальные, как у козы", pulse: "180 уд/мин", anomaly: "У сканируемого субъекта полностью отсутствует тень на полу, хотя прожекторы светят прямо на неё.", isMonster: true, scaryMsg: "Анна мгновенно растворяется в воздухе и материализуется прямо у вас за спиной. Вы чувствуете ледяное дыхание на шее за секунду до удара..." },
+    { name: "Субъект #9", eyes: "Желтые, светятся в темноте", pulse: "Вместо пульса из динамика идет радиошум", anomaly: "Сканер зафиксировал, что под одеждой у субъекта вместо ребер шевелятся костяные отростки.", isMonster: true, scaryMsg: "Субъект разрывает свою одежду, обнажая пасть во всю грудь, и заживо заглатывает вас прямо на рабочем месте!" }
 ];
 
 let score = 0;
@@ -164,7 +181,25 @@ const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
 const container = document.getElementById('game-container');
 
+// Функция генерации случайного человека
+function generateRandomHuman() {
+    const randomName = humanNames[Math.floor(Math.random() * humanNames.length)];
+    const randomEyes = humanEyes[Math.floor(Math.random() * humanEyes.length)];
+    const randomPulse = Math.floor(Math.random() * (90 - 65 + 1)) + 65 + " уд/мин"; // Здоровый пульс от 65 до 90
+    const randomAnomaly = humanAnomalies[Math.floor(Math.random() * humanAnomalies.length)];
+    
+    return {
+        name: randomName,
+        eyes: randomEyes,
+        pulse: randomPulse,
+        anomaly: randomAnomaly,
+        isMonster: false,
+        scaryMsg: ""
+    };
+}
+
 function nextVisitor() {
+    // Если была игра окончена, сбрасываем всё
     if(gameOver) {
         score = 0;
         scoreText.innerText = score;
@@ -176,10 +211,14 @@ function nextVisitor() {
     monitor.style.color = "#00ff00";
     btnAllow.style.display = "inline-block";
     btnAlarm.style.display = "inline-block";
-    btnNext.style.style = "none";
     btnNext.style.display = "none";
 
-    currentVisitor = visitors[Math.floor(Math.random() * visitors.length)];
+    // Рандомим: 50% шанс встретить монстра, 50% шанс сгенерировать абсолютно уникального человека
+    if (Math.random() < 0.5) {
+        currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
+    } else {
+        currentVisitor = generateRandomHuman();
+    }
 
     monitorContent.innerHTML = `
         <div class="stat-line"><b>=== СКАНИРОВАНИЕ СУБЪЕКТА ===</b></div><br>
@@ -195,54 +234,16 @@ function allowEntry() {
     btnAlarm.style.display = "none";
     
     if (currentVisitor.isMonster) {
-        // СКРИМЕР И ПРОИГРЫШ
+        // СКРИМЕР И ПОЛНЫЙ ПРОИГРЫШ
         gameOver = true;
         container.classList.add('screamer-active');
         monitor.style.backgroundColor = "#550000";
         monitor.style.color = "#fff";
         monitorContent.innerHTML = `
             <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">КРИТИЧЕСКАЯ ОШИБКА!</div><br>
-            <div class="stat-line">Вы открыли дверь... и это было вашей последней ошибкой.</div><br>
-            <div class="stat-line" style="color: #ffcc00;"><b>ЧТО ПРОИЗОШЛО:</b> ${currentVisitor.scaryMsg}</div>
+            <div class="stat-line">Вы открыли гермозатвор... Это была ваша последняя ошибка.</div><br>
+            <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000;"><b>ХОРРОР-ОТЧЕТ:</b> ${currentVisitor.scaryMsg}</div>
         `;
         btnNext.innerText = "НАЧАТЬ ЗАНОВО";
         btnNext.style.display = "block";
-    } else {
-        // Успешно впустили человека
-        score++;
-        scoreText.innerText = score;
-        monitor.style.backgroundColor = "#003300";
-        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px;">Это обычный человек. <br>Он успешно прошел на базу.</div>`;
-        btnNext.innerText = "СЛЕДУЮЩИЙ В ОЧЕРЕДИ";
-        btnNext.style.display = "block";
     }
-}
-
-function triggerAlarm() {
-    btnAllow.style.display = "none";
-    btnAlarm.style.display = "none";
-
-    if (currentVisitor.isMonster) {
-        // Успешно сожгли монстра
-        score++;
-        scoreText.innerText = score;
-        monitor.style.backgroundColor = "#003300";
-        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00;">УГРОЗА ЛИКВИДИРОВАНА!<br><br>Система выжгла подражателя лазером.</div>`;
-    } else {
-        // Убили человека (штраф)
-        score = Math.max(0, score - 1);
-        scoreText.innerText = score;
-        monitor.style.backgroundColor = "#555500";
-        monitor.style.color = "#000";
-        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; font-weight: bold;">ТРАГЕДИЯ.<br><br>Вы ликвидировали невиновного человека. Руководство выписывает вам штраф за паранойю.</div>`;
-    }
-    btnNext.innerText = "СЛЕДУЮЩИЙ В ОЧЕРЕДИ";
-    btnNext.style.display = "block";
-}
-
-// Запуск первой игры
-nextVisitor();
-</script>
-
-</body>
-</html>
