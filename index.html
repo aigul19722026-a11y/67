@@ -131,39 +131,39 @@
         }
 
         .screamer-face {
-            font-size: 14px;
-            line-height: 1.1;
+            font-size: 10px;
+            line-height: 1.0;
             white-space: pre;
             text-align: center;
             font-family: monospace;
-            text-shadow: 0 0 15px #ff0000;
+            text-shadow: 0 0 25px #ff0000;
         }
 
-        /* Бешеная тряска и пульсация для скримера */
+        /* УЛЬТРА-ТРЯСКА И ЗУМ ДЛЯ КРИКА ДМИТРИЯ */
         .screamer-shake {
-            animation: hard-shake 0.04s infinite, flash-red 0.08s infinite, face-zoom 1.2s forwards;
+            animation: hard-shake 0.03s infinite, flash-red 0.06s infinite, face-zoom 1.0s forwards;
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(10px, 8px) rotate(1deg); }
-            50% { transform: translate(-10px, -8px) rotate(-1deg); }
-            100% { transform: translate(8px, -10px) rotate(0deg); }
+            0% { transform: translate(15px, 12px) rotate(2deg); }
+            50% { transform: translate(-15px, -12px) rotate(-2deg); }
+            100% { transform: translate(12px, -15px) rotate(0deg); }
         }
 
         @keyframes flash-red {
-            0%, 100% { color: #ff0000; background-color: #000; }
-            50% { color: #000000; background-color: #500; }
+            0%, 100% { color: #ff0000; background-color: #020000; }
+            50% { color: #ffffff; background-color: #700; }
         }
 
         @keyframes face-zoom {
-            0% { transform: scale(0.6); }
-            100% { transform: scale(2.5); }
+            0% { transform: scale(0.5); }
+            40% { transform: scale(1.8); }
+            100% { transform: scale(4.0); } /* Лицо буквально разрывает экран */
         }
     </style>
 </head>
 <body>
 
-<!-- Наложенный слой для скримеров -->
 <div id="screamer-overlay">
     <div id="screamer-art" class="screamer-face"></div>
 </div>
@@ -194,71 +194,52 @@ const humanAnomalies = [
     "Нет. Потерял ключи от дома, просится погреться."
 ];
 
-// Текстовые заготовки рож монстров (ASCII Art)
-const faceMichael = `
-     .XNNNNNX.     
-    X*  .  .  *X   
-   X  (O)  (O)  X  
-  X      ||      X 
- X       ||       X
- X   /=========\  X
- X  |           | X
- X  |           | X
-  X |           |X 
-   X|___________|X 
-     VVVVVVVVVVV   
-`;
-
-const faceOlga = `
-    /XXXXXXXXX\\    
-   X  x     x  X   
-  X     ___     X  
- X    /     \\    X 
-X    |  X X  |    X
-X     \\ ___ /    X 
- X  W W W W W W  X 
-  X  V V V V V  X  
-   \\XXXXXXXXX/    
-`;
-
-const faceIvan = `
-     .--------.    
-    /  O  O  O \\   
-   |            |  
-   |    ____    |  
-   |   /    \\   |  
-    \\  \\____/  /   
-     '--------'    
-`;
-
-const faceUnknown = `
-     .AMMMMMA.     
-    AMMMMMMMMMA    
-   A  !!!  !!!  A  
-  A  !!!!  !!!!  A 
-  A              A 
-  A   !!!!!!!!   A 
-   A   !!!!!!   A  
-    A.        .A   
-      VMMMMMV      
-`;
-
-const faceDouble = `
-     .::::::.     
-    ::::::::::    
-   :: 🕇 :::: 🕇 ::   
-   ::::::::::::   
-   ::  ======  ::   
-    ::::::::::    
-     '::::::'     
+// ХОРРОР ASCII ИСКАЖЕННОЕ ЛИЦО ДЛЯ ТКСТ ДМИТРИЯ С ПУСТЫМИ ГЛАЗНИЦАМИ
+const faceDmitriyCopy = `
+       .XXXXXXXXXXXXX.
+     .XXXXXXXXXXXXXXXXX.
+    XXXXXXXXXXXXXXXXXXXXX
+   XXXXX  [ ]     [ ]  XXXXX
+  XXXXX   |X|     |X|   XXXXX
+ XXXXXX   |_|     |_|   XXXXX
+ XXXXXXXXXXXXXXXXXXXXXXXXXXX
+ XXXXXXX  XXXXXXXXXXX  XXXXX
+  XXXXXX  XXXXXXXXXXX  XXXXX
+   XXXXX               XXXXX
+    XXXXX  | | | | |  XXXXX
+     XXXXX | | | | | XXXXX
+       'XXXXXXXXXXXXX'
+          |||||||||
 `;
 
 const monsters = [
-    { name: "Михаил", eyes: "Черные... без белков", pulse: "0 уд/мин", anomaly: "Кожа бледная, а улыбка подозрительно широкая и неподвижная.", isMonster: true, scaryMsg: "Михаил резко удлиняет челюсть до пола, издает дикий вопль и разрывает вас на части прямо через разбитое стекло!", face: faceMichael },
-    { name: "Ольга", eyes: "Голубые, моргает невпопад", pulse: "240 уд/мин", anomaly: "Температура тела 12 градусов. Документы липкие и пахнут сыростью.", isMonster: true, scaryMsg: "Ольга с хрустом выворачивает суставы наизнанку, превращается в многоногую тварь и утаскивает вас в вентиляцию!", face: faceOlga },
-    { name: "Иван", eyes: "Карие, но их ТРИ на лице", pulse: "90 уд/мин", anomaly: "Пытается натянуть кепку на лоб. Издает глухое горловое рычание.", isMonster: true, scaryMsg: "Третий глаз Ивана намертво гипнотизирует вас, пока его истинная пасть вырывает твое сердце!", face: faceIvan },
-    { name: "Неизвестный", eyes: "Пустые темные глазницы", pulse: "Ошибка прибора", anomaly: "Вместо ответов издает непрерывный хруст ломающихся костей.", isMonster: true, scaryMsg: "Из пустых глазниц твари вырываются десятки черных щупалец, превращая вас в кровавое месиво...", face: faceUnknown },
-    { name: "Двойник", eyes: "Абсолютно копия ваших", pulse: "45 уд/мин", anomaly: "Внешность на 100% совпадает с ВАШЕЙ внешностью. Он смотрит на вас и ухмыляется.", isMonster: true, scaryMsg: "Двойник разбивает стекло, хватает вас за горло и шепчет: 'Теперь я буду сидеть на этом посту'...", face: faceDouble }
+    { 
+        name: "txt.Dmitriy.copy", 
+        eyes: "ОТСУТСТВУЮТ (ВЫРЕЗАНЫ/ПУСТОТА)", 
+        pulse: "⚠️ ОШИБКА ЯДРА СЕРВЕРА (-1)", 
+        anomaly: "Возраст по базе данных: 12930897 лет. Файл поврежден. Вместо лица — статичные помехи, система сканирования критически перегружена при попытке распознать этот объект.", 
+        isMonster: true, 
+        scaryMsg: "Файл txt.Dmitriy.copy полностью стирает вашу личность из базы данных. Из монитора вырывается бесконечный поток битых системных пикселей, утаскивая вас в пустоту кода... ЕМУ 12930897 ЛЕТ, ЕГО НЕЛЬЗЯ БЫЛО ВПУСКАТЬ!", 
+        face: faceDmitriyCopy 
+    },
+    { 
+        name: "Михаил", 
+        eyes: "Черные... без белков", 
+        pulse: "0 уд/мин", 
+        anomaly: "Кожа бледная, а улыбка подозрительно широкая и неподвижная.", 
+        isMonster: true, 
+        scaryMsg: "Михаил резко удлиняет челюсть до пола, издает дикий вопль и разрывает вас на части прямо через разбитое стекло!", 
+        face: faceDmitriyCopy 
+    },
+    { 
+        name: "Неизвестный", 
+        eyes: "Пустые темные глазницы", 
+        pulse: "Ошибка прибора", 
+        anomaly: "Вместо ответов издает непрерывный хруст ломающихся костей.", 
+        isMonster: true, 
+        scaryMsg: "Из пустых глазниц твари вырываются десятки черных щупалец, превращая вас в кровавое месиво...", 
+        face: faceDmitriyCopy 
+    }
 ];
 
 let score = 0;
@@ -307,21 +288,21 @@ function playScreamerSound() {
 
     let noiseFilter = audioCtx.createBiquadFilter();
     noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.setValueAtTime(800, audioCtx.currentTime);
-    noiseFilter.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 1.5);
+    noiseFilter.frequency.setValueAtTime(900, audioCtx.currentTime);
+    noiseFilter.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 1.5);
 
     let noiseGain = audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.95, audioCtx.currentTime); // Сделал громче!
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+    noiseGain.gain.setValueAtTime(1.0, audioCtx.currentTime); // Максимальный уровень звука!
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
 
     let bassOsc = audioCtx.createOscillator();
-    bassOsc.type = 'sawtooth'; // Смена на sawtooth для большей агрессии звука
-    bassOsc.frequency.setValueAtTime(110, audioCtx.currentTime);
-    bassOsc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.8);
+    bassOsc.type = 'sawtooth'; 
+    bassOsc.frequency.setValueAtTime(130, audioCtx.currentTime);
+    bassOsc.frequency.linearRampToValueAtTime(20, audioCtx.currentTime + 1.0);
     
     let bassGain = audioCtx.createGain();
-    bassGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-    bassGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+    bassGain.gain.setValueAtTime(1.0, audioCtx.currentTime);
+    bassGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.0);
 
     noise.connect(noiseFilter);
     noiseFilter.connect(noiseGain);
@@ -395,7 +376,7 @@ function nextVisitor() {
     btnAlarm.style.display = "inline-block";
     btnNext.style.display = "none";
 
-    if (Math.random() < 0.5) {
+    if (Math.random() < 0.6) { // Чуть увеличил шанс выпадения монстров для теста
         currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
     } else {
         currentVisitor = generateRandomHuman();
@@ -406,8 +387,8 @@ function nextVisitor() {
 
 function renderVisitor() {
     monitorContent.innerHTML = `
-        <div class="stat-line"><b>=== СКАНИРОВАНИЕ СУБЪЕКТА ===</b></div><br>
-        <div class="stat-line"><b>Имя по документам:</b> ${currentVisitor.name}</div>
+        <div class="stat-line"><b>=== КРИТИЧЕСКАЯ ОШИБКА ДАННЫХ ===</b></div><br>
+        <div class="stat-line"><b>Имя по документам:</b> <span style="color:#ff0000; font-weight:bold;">${currentVisitor.name}</span></div>
         <div class="stat-line"><b>Глаза:</b> ${currentVisitor.eyes}</div>
         <div class="stat-line"><b>Пульс:</b> ${currentVisitor.pulse}</div>
         <div class="stat-line anomaly-box"><b>Особые приметы / Аномалии:</b><br>>> ${currentVisitor.anomaly}</div>
@@ -424,12 +405,12 @@ function allowEntry() {
         ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
         playScreamerSound(); 
         
-        // Показываем оверлей со страшной физиономией на весь экран
+        // Включаем жуткое безглазое лицо на весь экран
         screamerArt.innerText = currentVisitor.face;
         overlay.style.display = "flex";
         overlay.classList.add('screamer-shake');
 
-        // Через 1.4 секунды убираем рожу и выдаем спокойный ЧИТАЕМЫЙ отчет
+        // Тряска и зум длятся 1 секунду, затем выводится отчет о смерти
         setTimeout(() => {
             overlay.classList.remove('screamer-shake');
             overlay.style.display = "none";
@@ -437,13 +418,13 @@ function allowEntry() {
             monitor.style.backgroundColor = "#400";
             monitor.style.color = "#fff";
             monitorContent.innerHTML = `
-                <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">СЕКТОР ПРОБИТ!</div><br>
-                <div class="stat-line">Вы открыли дверь подражателю...</div><br>
-                <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000;"><b>ОТЧЕТ О СМЕРТИ:</b> ${currentVisitor.scaryMsg}</div>
+                <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">ОБЪЕКТ ПРОНИК В БУНКЕР!</div><br>
+                <div class="stat-line">Вы впустили поврежденный файл...</div><br>
+                <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000;"><b>ОТЧЕТ ОБ АННИГИЛЯЦИИ:</b> ${currentVisitor.scaryMsg}</div>
             `;
-            btnNext.innerText = "НАЧАТЬ ЗАНОВО";
+            btnNext.innerText = "ПЕРЕЗАГРУЗИТЬ СЕРВЕР";
             btnNext.style.display = "block";
-        }, 1400);
+        }, 1000);
 
     } else {
         score++;
@@ -464,7 +445,7 @@ function triggerAlarm() {
         score++;
         scoreText.innerText = score;
         monitor.style.backgroundColor = "#003300";
-        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00; font-weight: bold;">УГРОЗА УНИЧТОЖЕНА.<br><br>Подражатель ликвидирован системой защиты.</div>`;
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00; font-weight: bold;">УГРОЗА УНИЧТОЖЕНА.<br><br>Подражатель успешно изолирован и стерт из системы.</div>`;
     } else {
         score = Math.max(0, score - 1);
         scoreText.innerText = score;
