@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ОКП: Отдел Контроля Подражателей</title>
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 90%;
+            max-width: 550px;
+            background-color: #111;
+            border: 3px solid #aa0000;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(170, 0, 0, 0.5);
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #aa0000;
+            font-size: 24px;
+            margin-top: 0;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(170, 0, 0, 0.8);
+        }
+
+        #monitor {
+            background-color: #1a1a1a;
+            border: 2px solid #333;
+            padding: 20px;
+            min-height: 200px;
+            text-align: left;
+            margin: 20px 0;
+            border-radius: 5px;
+            box-shadow: inset 0 0 10px #000;
+            transition: all 0.3s ease;
+        }
+
+        .stat-line {
+            margin: 8px 0;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .anomaly-box {
+            color: #ff9900;
+            margin-top: 15px;
+            border-top: 1px dashed #555;
+            padding-top: 10px;
+        }
+
+        #score-board {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        button {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px 24px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s;
+            color: white;
+        }
+
+        #btn-allow { background-color: #005500; }
+        #btn-allow:hover { background-color: #008800; }
+
+        #btn-alarm { background-color: #550000; }
+        #btn-alarm:hover { background-color: #880000; }
+
+        #btn-next {
+            background-color: #333;
+            margin-top: 15px;
+            width: 100%;
+        }
+        #btn-next:hover { background-color: #444; }
+
+        /* Эффект скримера */
+        .screamer-active {
+            animation: shake 0.1s infinite, flash 0.2s infinite;
+            border-color: #ff0000 !important;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        @keyframes flash {
+            0%, 100% { background-color: #111; }
+            50% { background-color: #400; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>ПОСТ НАБЛЮДЕНИЯ #4</h1>
+    <div id="score-board">Успешно проверено граждан: <span id="score">0</span></div>
+    
+    <div id="monitor">
+        <div id="monitor-content">Загрузка системы сканирования...</div>
+    </div>
+
+    <div class="btn-group">
+        <button id="btn-allow" onclick="allowEntry()">ВПУСТИТЬ</button>
+        <button id="btn-alarm" onclick="triggerAlarm()">ЛИКВИДИРОВАТЬ</button>
+    </div>
+    <button id="btn-next" onclick="nextVisitor()" style="display:none;">СЛЕДУЮЩИЙ В ОЧЕРЕДИ</button>
+</div>
+
+<script>
+const visitors = [
+    { name: "Алексей", eyes: "Карие, обычные", pulse: "75 уд/мин", anomaly: "Нет. Обычный парень, немного уставший.", isMonster: false, scaryMsg: "" },
+    { name: "Елена", eyes: "Зеленые, живые", pulse: "82 уд/мин", anomaly: "Нет. Жалуется на головную боль из-за погоды.", isMonster: false, scaryMsg: "" },
+    { name: "Михаил", eyes: "Черные... слишком черные, без белков", pulse: "0 уд/мин", anomaly: "Его кожа кажется серой, а улыбка подозрительно широкая.", isMonster: true, scaryMsg: "Михаил резко удлиняет челюсть до пола, издает оглушительный ультразвуковой вопль и перекусывает вас пополам прямо через стекло!" },
+    { name: "Ольга", eyes: "Голубые, моргает невпопад", pulse: "240 уд/мин", anomaly: "Температура тела 12 градусов. Документы пахнут могильной сыростью.", isMonster: true, scaryMsg: "Ольга с диким хрустом выворачивает суставы наизнанку, превращается в многоногую тварь и мгновенно утаскивает вас в вентиляцию!" },
+    { name: "Иван", eyes: "Карие, но их ТРИ на лице", pulse: "90 уд/мин", anomaly: "Пытается прикрыть кепкой лоб. Постоянно дергается и тихо рычит.", isMonster: true, scaryMsg: "Третий глаз Ивана на лбу открывается и намертво гипнотизирует вас, пока его истинная пасть разрывает твою грудную клетку!" },
+    { name: "Дмитрий", eyes: "Серые, испуганные", pulse: "110 уд/мин", anomaly: "Очень сильно напуган. Дрожащим голосом умоляет впустить его и спрятать от 'них'.", isMonster: false, scaryMsg: "" },
+    { name: "Неизвестный", eyes: "Отсутствуют (пустые темные глазницы)", pulse: "Не считывается", anomaly: "Вместо ответа на вопросы издает жуткий хруст ломающихся костей.", isMonster: true, scaryMsg: "Из пустых глазниц существа вырываются длинные черные щупальца, разбивая бронированное стекло вдребезги..." }
+];
+
+let score = 0;
+let currentVisitor = null;
+let gameOver = false;
+
+const monitor = document.getElementById('monitor');
+const monitorContent = document.getElementById('monitor-content');
+const scoreText = document.getElementById('score');
+const btnAllow = document.getElementById('btn-allow');
+const btnAlarm = document.getElementById('btn-alarm');
+const btnNext = document.getElementById('btn-next');
+const container = document.getElementById('game-container');
+
+function nextVisitor() {
+    if(gameOver) {
+        score = 0;
+        scoreText.innerText = score;
+        gameOver = false;
+        container.classList.remove('screamer-active');
+    }
+    
+    monitor.style.backgroundColor = "#1a1a1a";
+    monitor.style.color = "#00ff00";
+    btnAllow.style.display = "inline-block";
+    btnAlarm.style.display = "inline-block";
+    btnNext.style.style = "none";
+    btnNext.style.display = "none";
+
+    currentVisitor = visitors[Math.floor(Math.random() * visitors.length)];
+
+    monitorContent.innerHTML = `
+        <div class="stat-line"><b>=== СКАНИРОВАНИЕ СУБЪЕКТА ===</b></div><br>
+        <div class="stat-line"><b>Имя по документам:</b> ${currentVisitor.name}</div>
+        <div class="stat-line"><b>Глаза:</b> ${currentVisitor.eyes}</div>
+        <div class="stat-line"><b>Пульс:</b> ${currentVisitor.pulse}</div>
+        <div class="stat-line anomaly-box"><b>Особые приметы / Аномалии:</b><br>>> ${currentVisitor.anomaly}</div>
+    `;
+}
+
+function allowEntry() {
+    btnAllow.style.display = "none";
+    btnAlarm.style.display = "none";
+    
+    if (currentVisitor.isMonster) {
+        // СКРИМЕР И ПРОИГРЫШ
+        gameOver = true;
+        container.classList.add('screamer-active');
+        monitor.style.backgroundColor = "#550000";
+        monitor.style.color = "#fff";
+        monitorContent.innerHTML = `
+            <div class="stat-line" style="color: #ff0000; font-size: 20px; font-weight: bold; text-align:center;">КРИТИЧЕСКАЯ ОШИБКА!</div><br>
+            <div class="stat-line">Вы открыли дверь... и это было вашей последней ошибкой.</div><br>
+            <div class="stat-line" style="color: #ffcc00;"><b>ЧТО ПРОИЗОШЛО:</b> ${currentVisitor.scaryMsg}</div>
+        `;
+        btnNext.innerText = "НАЧАТЬ ЗАНОВО";
+        btnNext.style.display = "block";
+    } else {
+        // Успешно впустили человека
+        score++;
+        scoreText.innerText = score;
+        monitor.style.backgroundColor = "#003300";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px;">Это обычный человек. <br>Он успешно прошел на базу.</div>`;
+        btnNext.innerText = "СЛЕДУЮЩИЙ В ОЧЕРЕДИ";
+        btnNext.style.display = "block";
+    }
+}
+
+function triggerAlarm() {
+    btnAllow.style.display = "none";
+    btnAlarm.style.display = "none";
+
+    if (currentVisitor.isMonster) {
+        // Успешно сожгли монстра
+        score++;
+        scoreText.innerText = score;
+        monitor.style.backgroundColor = "#003300";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; color: #00ff00;">УГРОЗА ЛИКВИДИРОВАНА!<br><br>Система выжгла подражателя лазером.</div>`;
+    } else {
+        // Убили человека (штраф)
+        score = Math.max(0, score - 1);
+        scoreText.innerText = score;
+        monitor.style.backgroundColor = "#555500";
+        monitor.style.color = "#000";
+        monitorContent.innerHTML = `<br><br><div class="stat-line" style="text-align:center; font-size: 18px; font-weight: bold;">ТРАГЕДИЯ.<br><br>Вы ликвидировали невиновного человека. Руководство выписывает вам штраф за паранойю.</div>`;
+    }
+    btnNext.innerText = "СЛЕДУЮЩИЙ В ОЧЕРЕДИ";
+    btnNext.style.display = "block";
+}
+
+// Запуск первой игры
+nextVisitor();
+</script>
+
+</body>
+</html>
