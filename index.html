@@ -163,7 +163,7 @@
                 hasContraband: false,
                 isMonster: true, 
                 anomaly: "ПРИЗНАК: Пытается имитировать человеческую мимику, но углы рта разорваны и неестественно растянуты.",
-                scaryMsg: "Ложная копия проникла на базу. Ночью终端 зафиксировал крики в жилом секторе.",
+                scaryMsg: "Ложная копия проникла на базу. Ночью терминал зафиксировал крики в жилом секторе.",
                 image: "mimic.png"
             },
             { 
@@ -200,7 +200,7 @@
                 isMonster: false,
                 anomaly: "ПРИЗНАК: Нервно переминается с ноги на ногу. Пытается спрятать рюкзак от сканера вещей.",
                 scaryMsg: "Вы впустили человека с образцом заражения. Лабораторный вирус уничтожил бункер за 48 часов.",
-                image: "supplier.png" // Исправлен дубликат картинки
+                image: "supplier.png" 
             }
         ];
 
@@ -210,10 +210,68 @@
         let currentVisitor = null;
         let cameraActive = false;
         let gameOver = false;
-        let isProcessing = false; // Флаг блокировки интерфейса во время анимации урона
+        let isProcessing = false; 
 
         const monitorContent = document.getElementById('monitor');
         const btnCamera = document.getElementById('btn-camera');
+
+        // ЗВУКОВОЙ ДВИЖОК (Генерация на лету через Web Audio API)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            // амортизация политики автоплея браузеров
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'scan') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(300, now + 0.15);
+                gain.gain.setValueAtTime(0.04, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'shoot') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(80, now);
+                osc.frequency.setValueAtTime(75, now + 0.1);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'gameover') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(60, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 1.5);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + 1.5);
+                osc.start(now);
+                osc.stop(now + 1.5);
+            }
+        }
 
         function startGame(mode) {
             gameMode = mode;
@@ -222,6 +280,7 @@
             gameOver = false;
             isProcessing = false;
             
+            playSound('click');
             document.getElementById('menu-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
             
@@ -254,17 +313,31 @@
             renderVisitor();
         }
 
+        function handleImgError() {
+            // Если файл картинки не найден на диске, выводим красивую хоррор-заглушку
+            const streamBox = document.getElementById('video-stream-box');
+            if (streamBox) {
+                streamBox.innerHTML = `
+                    <div style="color: #ff3333; border: 2px dashed #ff3333; padding: 20px; text-align: center; font-weight: bold; font-size: 13px;">
+                        [КРИТИЧЕСКАЯ ОШИБКА ИНТЕРФЕЙСА]<br>
+                        СБОЙ СИГНАЛА: ФАЙЛ "${currentVisitor.image.toUpperCase()}" НЕ НАЙДЕН.<br>
+                        <span style="color: #00ff00; font-weight: normal; font-size: 11px;"><br>Убедитесь, что файл лежит в одной папке с игрой.</span>
+                    </div>
+                `;
+            }
+        }
+
         function renderVisitor() {
             if (gameOver) return;
 
             if (cameraActive) {
                 if (currentVisitor.image) {
                     monitorContent.innerHTML = `
-                        <div style="position: relative; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div id="video-stream-box" style="position: relative; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                             <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0, 255, 0, 0.15); mix-blend-mode: color; pointer-events: none; z-index: 2;"></div>
                             <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); background-size: 100% 4px, 6px 100%; pointer-events: none; z-index: 3;"></div>
                             
-                            <img src="${currentVisitor.image}" alt="CAM_FEED" style="max-width: 85%; max-height: 80%; border: 1px solid #00ff00; filter: contrast(1.2) brightness(0.8) sepia(1) hue-rotate(60deg);">
+                            <img src="${currentVisitor.image}" onerror="handleImgError()" alt="CAM_FEED" style="max-width: 85%; max-height: 80%; border: 1px solid #00ff00; filter: contrast(1.2) brightness(0.8) sepia(1) hue-rotate(60deg);">
                             <div style="color: #00ff00; font-family: monospace; font-size: 12px; margin-top: 5px;" class="blinking">• CAM_01_INTRUDER_LIVE</div>
                         </div>
                     `;
@@ -291,6 +364,7 @@
 
         function toggleCamera() {
             if (gameOver || isProcessing) return;
+            playSound('scan');
             cameraActive = !cameraActive;
             if (cameraActive) {
                 btnCamera.innerText = "[👁️] КАМЕРА АКТИВНА";
@@ -304,6 +378,7 @@
 
         function processVisitor(wantsToLetIn) {
             if (gameOver || isProcessing) return;
+            playSound('click');
 
             if (wantsToLetIn) {
                 if (currentVisitor.isMonster || currentVisitor.hasContraband) {
@@ -318,11 +393,11 @@
                 } else if (currentVisitor.hasContraband) {
                     health -= 50;
                     checkHealth("Контрабандист, которому отказали, устроил диверсию на внешнем шлюзе.");
-                    return; // Исправлен критический баг (прерываем выполнение)
+                    return;
                 } else {
                     health -= 35;
                     checkHealth(currentVisitor.scaryMsg);
-                    return; // Исправлен критический баг (прерываем выполнение)
+                    return;
                 }
             }
 
@@ -331,28 +406,30 @@
 
         function shootVisitor() {
             if (gameOver || isProcessing) return;
+            playSound('shoot');
 
             if (currentVisitor.hasContraband) {
                 score++;
             } else if (currentVisitor.isMonster) {
                 health -= 50;
                 checkHealth(`Вы открыли огонь по подражателю. Существо пришло в ярость и деформировало бронированную дверь шлюза.`);
-                return; // Исправлено
+                return;
             } else {
                 health -= 50;
                 checkHealth("Вы ликвидировали лояльного гражданина бункера. Автоматический трибунал понизил стабильность шлюза.");
-                return; // Исправлено
+                return;
             }
 
             checkWinCondition();
         }
 
         function checkHealth(reason) {
+            playSound('error');
             updateHUD();
             if (health <= 0) {
                 triggerGameOver(reason);
             } else {
-                isProcessing = true; // Блокируем новые нажатия кнопок во время вывода ошибки
+                isProcessing = true; 
                 monitorContent.innerHTML = `<div style="color:#ff3333; text-align:center; padding-top:80px; font-weight:bold;">[ПОВРЕЖДЕНИЕ СИСТЕМЫ]<br><br>${reason}</div>`;
                 setTimeout(() => {
                     nextVisitor();
@@ -378,6 +455,7 @@
         }
 
         function triggerGameOver(message) {
+            playSound('gameover');
             gameOver = true;
             monitorContent.innerHTML = `
                 <div style="color:#ff3333; text-align:center; padding-top:40px;">
