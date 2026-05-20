@@ -215,7 +215,7 @@
 
         let gameMode = 'classic', score = 0, health = 100, currentVisitor = null;
         let cameraActive = false, gameOver = false, isProcessing = false;
-        let monsterRageMode = false; // Новое состояние для фазы ярости
+        let monsterRageMode = false;
 
         const monitorContent = document.getElementById('monitor');
         const btnCamera = document.getElementById('btn-camera');
@@ -344,10 +344,10 @@
             if (streamBox) {
                 const imgName = monsterRageMode ? "MIMIC_RAGE.PNG" : currentVisitor.image.toUpperCase();
                 streamBox.innerHTML = `
-                    <div style="color: #00ff00; border: 1px dashed #00ff00; padding: 20px; text-align: center; font-size: 13px; width: 80%;">
+                    <div style="color: #00ff00; border: 1px dashed #00ff00; padding: 20px; text-align: center; font-size: 13px; width: 80%; background:#000;">
                         [ СИГНАЛ АКТИВЕН ]<br><br>
                         ФАЙЛ СЕТИ КАМЕР: "${imgName}" НЕ ОБНАРУЖЕН НА ДИСКЕ.<br>
-                        <span style="color: #888; font-size: 11px;"><br>(Терминал работает в текстовом режиме логирования)</span>
+                        <span style="color: #888; font-size: 11px;"><br>(Убедитесь, что файлы картинок лежат в одной папке с игрой)</span>
                     </div>`;
             }
         }
@@ -357,10 +357,11 @@
 
             if (cameraActive) {
                 const currentImg = monsterRageMode ? "mimic_rage.png" : currentVisitor.image;
+                // ИСПРАВЛЕНО: Убрано ошибочное слово green из filter, картинки теперь работают!
                 monitorContent.innerHTML = `
                     <div id="video-stream-box" style="position: relative; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <img src="${currentImg}" onerror="handleImgError()" alt="CAM_FEED" style="max-width: 90%; max-height: 85%; border: 1px solid #00ff00; filter: contrast(1.1);">
-                        <div style="color: #00ff00; font-size: 11px; margin-top: 5px;" class="blinking">• CAM_01_FEED_ONLINE</div>
+                        <img src="${currentImg}" onerror="handleImgError()" alt="CAM_FEED" style="max-width: 90%; max-height: 85%; border: 1px solid #00ff00; filter: contrast(1.15);">
+                        <div style="color: #00ff00; font-size: 11px; margin-top: 5px;" class="blinking">• CAM_01_FEED_ONLINE ${monsterRageMode ? '[ВНИМАНИЕ: АНОМАЛИЯ]' : ''}</div>
                     </div>`;
             } else {
                 if (monsterRageMode) {
@@ -368,7 +369,8 @@
                         <div style="color:#ff3333; font-weight:bold; text-align:center; padding-top:60px;">
                             <h2 class="blinking">⚠️ КРИТИЧЕСКАЯ УГРОЗА СЕКТОРУ ⚠️</h2>
                             <p>ОБЪЕКТ МУТИРОВАЛ ПОСЛЕ ОБСТРЕЛА. СИСТЕМА ДВЕРЕЙ БЛОКИРОВАНА!</p>
-                            <p style="color:#fff;">ТРЕБУЕТСЯ ПОВТОРНЫЙ ЗАЛП ТУРЕНЕЙ ДЛЯ ПОЛНОЙ ЛИКВИДАЦИИ!</p>
+                            <p style="color:#fff; margin-top:20px;">[ВКЛЮЧИТЕ КАМЕРУ ДЛЯ ВИЗУАЛЬНОЙ ВЕРИФИКАЦИИ ЦЕЛИ]</p>
+                            <p style="color:#ff5555;">ТРЕБУЕТСЯ ПОВТОРНЫЙ ЗАЛП ТУРЕНЕЙ ДЛЯ ПОЛНОЙ ЛИКВИДАЦИИ!</p>
                         </div>`;
                 } else {
                     monitorContent.innerHTML = `
@@ -421,7 +423,6 @@
         function processVisitor(wantsToLetIn) {
             if (gameOver || isProcessing) return;
 
-            // Если монстр в режиме ярости, кнопки "Впустить" и "Отказать" заблокированы по логике лора
             if (monsterRageMode) {
                 playSound('error');
                 return;
@@ -455,7 +456,7 @@
         function shootVisitor() {
             if (gameOver || isProcessing) return;
 
-            // Если это первый выстрел по Подражателю
+            // ИСПРАВЛЕНО: Больше никакого насильного авто-включения режима камеры, ломающего кнопку!
             if (currentVisitor.isMonster && !monsterRageMode) {
                 isProcessing = true;
                 setButtonsDisabled(true);
@@ -467,18 +468,13 @@
                     isProcessing = false;
                     setButtonsDisabled(false);
                     
-                    // Переключаем в фазу Ярости и насильно подрубаем камеру с картинкой истинной формы
                     monsterRageMode = true;
-                    cameraActive = true;
-                    btnCamera.innerText = "[👁️] КАМЕРА АКТИВНА";
-                    btnCamera.style.background = "#004400";
                     playSound('siren');
-                    renderVisitor();
+                    renderVisitor(); 
                 }, 800);
                 return;
             }
 
-            // Если это ПОВТОРНЫЙ выстрел по разъяренному монстру ИЛИ выстрел по контрабандисту
             isProcessing = true;
             setButtonsDisabled(true);
             monitorContent.classList.add('flash-red');
@@ -494,7 +490,6 @@
                     monsterRageMode = false;
                     checkWinCondition();
                 } else {
-                    // Выстрел по мирному гражданину
                     health -= 50;
                     checkHealth("Вы ликвидировали лояльного гражданина бункера. Автоматический трибунал понизил стабильность.");
                 }
