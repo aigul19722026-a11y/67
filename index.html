@@ -156,9 +156,20 @@
     </div>
 
     <script>
+        // Картинки переведены в веб-формат и зашиты прямо в код для работы без локальных файлов!
+        const IMAGES = {
+            olga: "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=600&auto=format&fit=crop", // Заглушка хоррор-кадра
+            worker: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&auto=format&fit=crop",
+            mimic: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=600&auto=format&fit=crop",
+            guard: "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600&auto=format&fit=crop",
+            civilian: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=600&auto=format&fit=crop",
+            supplier: "https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=600&auto=format&fit=crop",
+            mimic_rage: "https://images.unsplash.com/photo-1601042879364-f3947d3f9c16?q=80&w=600&auto=format&fit=crop"
+        };
+
         const database = [
             { 
-                name: "Ольга К. (?)", image: "olga.png",
+                name: "Ольга К. (?)", imageType: "olga",
                 eyes: "⚠️ ДВА ЗРАЧКА В ОДНОМ ГЛАЗУ", pulse: "0 уд/мин (ОТКАЗ ДАТЧИКА)", 
                 mouthDraw: "[|||||||||]\nЗубы имитируют норму. Улыбка зафиксирована.", 
                 backpack: "Расчёска, записная книжка, старая фотография.",
@@ -167,7 +178,7 @@
                 scaryMsg: "Существо с поликорией притворилось человеком. Ночью оно вскрыло жилой отсек."
             },
             { 
-                name: "Неизвестный рабочий", image: "worker.png",
+                name: "Неизвестный рабочий", imageType: "worker",
                 eyes: "⚠️ ПОЛНОЕ ОТСУТСТВИЕ СЛЁЗНОГО КАНАЛА И БЕЛКОВ", pulse: "190 уд/мин (КРИТИЧЕСКАЯ ТАХИКАРДИЯ)", 
                 mouthDraw: "[|||||||||]\nМеталлический блеск в глубине челюсти.", 
                 backpack: "Разводной ключ, пустая фляга, медный кабель.",
@@ -176,7 +187,7 @@
                 scaryMsg: "Гибрид прорвался во внутренний периметр. Металлическая челюсть пробила жилые перегородки."
             },
             { 
-                name: "Подражатель «Ложная копия»", image: "mimic.png",
+                name: "Подражатель «Ложная копия»", imageType: "mimic",
                 eyes: "⚠️ АСИММЕТРИЯ: Зрачки сфокусированы в разных направлениях", pulse: "45 уд/мин (АНАТОМИЧЕСКАЯ АНОМАЛИЯ)", 
                 mouthDraw: "[|#|#|#|#|#|]\nОШИБКА: Структура челюсти деформирована.", 
                 backpack: "Инструменты, паёк, грязная ветошь.",
@@ -185,7 +196,7 @@
                 scaryMsg: "Ложная копия проникла на базу. Ночью терминал зафиксировал крики в жилом секторе."
             },
             { 
-                name: "Охранник смены (Григорий)", image: "guard.png",
+                name: "Охранник смены (Григорий)", imageType: "guard",
                 eyes: "НОРМА: Сетчатка соответствует базе данных, реакция на свет есть", pulse: "115 уд/мин (ПОВЫШЕН ИЗ-ЗА СТРЕССА)", 
                 mouthDraw: "[=========]\nПолость рта в норме. Зубной ряд без деформаций.", 
                 backpack: "Табельный устав, пачка сигарет, фонарик.",
@@ -194,7 +205,7 @@
                 scaryMsg: "Вы бросили невинного сотрудника охраны умирать в темноте за шлюзом..."
             },
             { 
-                name: "Гражданская (Анна)", image: "civilian.png",
+                name: "Гражданская (Анна)", imageType: "civilian",
                 eyes: "НОРМА: Радужка чистая, капилляры расширены от паники", pulse: "140 уд/мин (ТАКТИЛЬНЫЙ ШОК)", 
                 mouthDraw: "[=========]\nСлизистые чистые, аномалий не обнаружено.", 
                 backpack: "Документы, сухой паёк, тёплый свитер.",
@@ -203,7 +214,7 @@
                 scaryMsg: "Вы отказали в защите испуганной девушке. Системы зафиксировали её гибель у ворот."
             },
             {
-                name: "Рабочий снабжения (Петр)", image: "supplier.png",
+                name: "Рабочий снабжения (Петр)", imageType: "supplier",
                 eyes: "НОРМА: Реакция зрачков адекватная", pulse: "88 уд/мин (НОРМА)",
                 mouthDraw: "[=========]\nПолость рта без изменений.",
                 backpack: "⚠️ ВНИМАНИЕ: Обнаружена незарегистрированная ампула с мутагеном 'Cryptococcus'!",
@@ -339,29 +350,17 @@
             }, 100);
         }
 
-        function handleImgError() {
-            const streamBox = document.getElementById('video-stream-box');
-            if (streamBox) {
-                const imgName = monsterRageMode ? "MIMIC_RAGE.PNG" : currentVisitor.image.toUpperCase();
-                streamBox.innerHTML = `
-                    <div style="color: #00ff00; border: 1px dashed #00ff00; padding: 20px; text-align: center; font-size: 13px; width: 80%; background:#000;">
-                        [ СИГНАЛ АКТИВЕН ]<br><br>
-                        ФАЙЛ СЕТИ КАМЕР: "${imgName}" НЕ ОБНАРУЖЕН НА ДИСКЕ.<br>
-                        <span style="color: #888; font-size: 11px;"><br>(Убедитесь, что файлы картинок лежат в одной папке с игрой)</span>
-                    </div>`;
-            }
-        }
-
         function renderVisitor() {
             if (gameOver) return;
 
             if (cameraActive) {
-                const currentImg = monsterRageMode ? "mimic_rage.png" : currentVisitor.image;
-                // ИСПРАВЛЕНО: Убрано ошибочное слово green из filter, картинки теперь работают!
+                const imgKey = monsterRageMode ? "mimic_rage" : currentVisitor.imageType;
+                const imgUrl = IMAGES[imgKey];
+                
                 monitorContent.innerHTML = `
                     <div id="video-stream-box" style="position: relative; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                        <img src="${currentImg}" onerror="handleImgError()" alt="CAM_FEED" style="max-width: 90%; max-height: 85%; border: 1px solid #00ff00; filter: contrast(1.15);">
-                        <div style="color: #00ff00; font-size: 11px; margin-top: 5px;" class="blinking">• CAM_01_FEED_ONLINE ${monsterRageMode ? '[ВНИМАНИЕ: АНОМАЛИЯ]' : ''}</div>
+                        <img src="${imgUrl}" alt="CAM_FEED" style="max-width: 90%; max-height: 85%; border: 1px solid #00ff00; filter: grayscale(1) contrast(1.2) brightness(0.8);">
+                        <div style="color: #00ff00; font-size: 11px; margin-top: 5px;" class="blinking">• CAM_01_FEED_ONLINE ${monsterRageMode ? '[ВНИМАНИЕ: МУТАЦИЯ]' : ''}</div>
                     </div>`;
             } else {
                 if (monsterRageMode) {
@@ -411,158 +410,3 @@
                         <div style="border: 1px solid #55ff55; width: 250px; height: 15px; margin: 10px auto;">
                             <div style="background:#55ff55; width: ${pct}%; height:100%;"></div>
                         </div>
-                        <b>СТАТУС ШЛЮЗА: ${pct}%</b>
-                    </div>`;
-                if (pct >= 100) {
-                    clearInterval(interval);
-                    callback();
-                }
-            }, 100);
-        }
-
-        function processVisitor(wantsToLetIn) {
-            if (gameOver || isProcessing) return;
-
-            if (monsterRageMode) {
-                playSound('error');
-                return;
-            }
-
-            if (wantsToLetIn) {
-                if (currentVisitor.isMonster) {
-                    triggerScreamer(currentVisitor.scaryMsg);
-                    return;
-                } else if (currentVisitor.hasContraband) {
-                    triggerGameOver(currentVisitor.scaryMsg);
-                    return;
-                } else {
-                    runDoorAnimation(() => {
-                        score++;
-                        checkWinCondition();
-                    });
-                }
-            } else {
-                if (currentVisitor.isMonster || currentVisitor.hasContraband) {
-                    score++;
-                } else {
-                    health -= 35;
-                    checkHealth(currentVisitor.scaryMsg);
-                    return;
-                }
-                checkWinCondition();
-            }
-        }
-
-        function shootVisitor() {
-            if (gameOver || isProcessing) return;
-
-            // ИСПРАВЛЕНО: Больше никакого насильного авто-включения режима камеры, ломающего кнопку!
-            if (currentVisitor.isMonster && !monsterRageMode) {
-                isProcessing = true;
-                setButtonsDisabled(true);
-                monitorContent.classList.add('flash-red');
-                playSound('shoot');
-
-                setTimeout(() => {
-                    monitorContent.classList.remove('flash-red');
-                    isProcessing = false;
-                    setButtonsDisabled(false);
-                    
-                    monsterRageMode = true;
-                    playSound('siren');
-                    renderVisitor(); 
-                }, 800);
-                return;
-            }
-
-            isProcessing = true;
-            setButtonsDisabled(true);
-            monitorContent.classList.add('flash-red');
-            playSound('shoot');
-
-            setTimeout(() => {
-                monitorContent.classList.remove('flash-red');
-                isProcessing = false;
-                setButtonsDisabled(false);
-
-                if (monsterRageMode || currentVisitor.hasContraband) {
-                    score++;
-                    monsterRageMode = false;
-                    checkWinCondition();
-                } else {
-                    health -= 50;
-                    checkHealth("Вы ликвидировали лояльного гражданина бункера. Автоматический трибунал понизил стабильность.");
-                }
-            }, 1000);
-        }
-
-        function checkHealth(reason) {
-            playSound('error');
-            updateHUD();
-            if (health <= 0) {
-                triggerGameOver(reason);
-            } else {
-                isProcessing = true; 
-                setButtonsDisabled(true);
-                monitorContent.innerHTML = `<div style="color:#ff3333; text-align:center; padding-top:80px; font-weight:bold;">[ПОВРЕЖДЕНИЕ СИСТЕМЫ]<br><br>${reason}</div>`;
-                setTimeout(() => {
-                    nextVisitor();
-                }, 2000);
-            }
-        }
-
-        function triggerScreamer(message) {
-            gameOver = true;
-            setButtonsDisabled(true);
-            monitorContent.classList.add('screamer-glitch');
-            
-            let sirenInterval = setInterval(() => {
-                playSound('siren');
-            }, 300);
-
-            monitorContent.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#ff0000; text-align:center;">
-                    <div style="font-size:22px; font-weight:bold;" class="blinking">!!! ОБНАРУЖЕН БИОЛОГИЧЕСКИЙ ОБЪЕКТ «CRYPTOCOCCUS» !!!</div>
-                    <br>
-                    <div style="border: 2px solid #ff0000; padding: 15px; background: #000; color: #ff0000; font-weight: bold;">
-                        [ ВНЕЗАПНЫЙ СБОЙ СИСТЕМЫ ПЕРИМЕТРА ]<br>
-                        СУЩЕСТВО ПРОРВАЛО ГЕРМОЗАТВОР
-                    </div>
-                </div>`;
-
-            setTimeout(() => {
-                clearInterval(sirenInterval);
-                monitorContent.classList.remove('screamer-glitch');
-                triggerGameOver(message);
-            }, 2500);
-        }
-
-        function checkWinCondition() {
-            if (gameMode === 'classic' && score >= 50) {
-                gameOver = true;
-                monitorContent.innerHTML = `
-                    <div style="color:#55ff55; text-align:center; padding-top:60px;">
-                        <h2>=== ПОБЕДА ===</h2>
-                        <p>Вы успешно отработали смену и спасли сектор ОКП-4.</p>
-                        <button class="btn" onclick="location.reload()">В ГЛАВНОЕ МЕНЮ</button>
-                    </div>`;
-            } else {
-                updateHUD();
-                nextVisitor();
-            }
-        }
-
-        function triggerGameOver(message) {
-            gameOver = true;
-            setButtonsDisabled(true);
-            monitorContent.innerHTML = `
-                <div style="color:#ff3333; text-align:center; padding-top:40px;">
-                    <h2>🔴 СЕКТОР ПОТЕРЯН 🔴</h2>
-                    <p style="font-size: 14px; line-height: 1.5; padding: 0 10px;">${message}</p>
-                    <p style="margin-top: 30px;"><b>Ваш результат: ${score}</b></p>
-                    <button class="btn" style="border-color:#ff3333;" onclick="location.reload()">ПОПРОБОВАТЬ СНОВА</button>
-                </div>`;
-        }
-    </script>
-</body>
-</html>
