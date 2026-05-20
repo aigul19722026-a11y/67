@@ -156,6 +156,7 @@
     </div>
 
     <script>
+        // База данных — теперь без лишних папок, ищет файлы прямо «рядом»
         const database = [
             { 
                 name: "Ольга К. (?)", image: "olga.png",
@@ -202,7 +203,7 @@
                 anomaly: "ПРИЗНАК: Объект находится в состоянии тяжелого стресса, плачет.",
                 scaryMsg: "Вы отказали в защите испуганной девушке. Системы зафиксировали её гибель у ворот."
             },
-            {
+            { 
                 name: "Рабочий снабжения (Петр)", image: "supplier.png",
                 eyes: "НОРМА: Реакция зрачков адекватная", pulse: "88 уд/мин (НОРМА)",
                 mouthDraw: "[=========]\nПолость рта без изменений.",
@@ -346,14 +347,14 @@
             let shadowType = "ГУМАНОИДНЫЙ СИЛУЭТ";
             if (monsterRageMode) shadowType = "БИОМЕХАНИЧЕСКАЯ МАССА [КРИТИЧЕСКАЯ УГРОЗА]";
             
-            const filename = monsterRageMode ? 'mimic_rage.png' : currentVisitor.image;
+            const rawFilename = monsterRageMode ? 'mimic_rage.png' : currentVisitor.image;
             
             const glitchBox = document.createElement('div');
             glitchBox.style.cssText = "color: #00ff00; border: 2px dashed #ff3333; padding: 20px; text-align: center; background: #100; width: 85%; box-shadow: 0 0 15px rgba(255,0,0,0.2); font-size:12px;";
             glitchBox.innerHTML = `
                 <span style="color:#ff3333; font-weight:bold;" class="blinking">⚠️ СИГНАЛ АКТИВЕН (РЕЖИМ СИЛУЭТА)</span><br><br>
                 ДАТЧИК ДВИЖЕНИЯ ФИКСИРУЕТ: <span style="color:#fff;">${shadowType}</span><br>
-                <span style="color:#888; font-size:11px;"><br>Для вывода фото проверьте, что файл <b style="color:#00ffff;">"${filename}"</b> лежит в папке "окп" рядом с игрой.</span>
+                <span style="color:#888; font-size:11px;"><br>Браузер не видит картинку. Убедись, что файл <b style="color:#00ffff;">"${rawFilename}"</b> лежит в той же папке, где и сам этот запущенный HTML-файл игры.</span>
             `;
             
             const oldAlert = container.querySelector('.img-error-alert');
@@ -367,6 +368,7 @@
             if (gameOver) return;
 
             if (cameraActive) {
+                // Ищем картинки прямо в корне текущего расположения файла игры
                 const currentImg = monsterRageMode ? "mimic_rage.png" : currentVisitor.image;
                 monitorContent.innerHTML = `
                     <div id="video-stream-box" style="position: relative; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -402,7 +404,7 @@
             if (gameOver || isProcessing) return;
             playSound('scan');
             cameraActive = !cameraActive;
-            btnCamera.innerText = cameraActive ? "[👁️] КАМЕРА АКТИВНА" : "[ ] ВКЛЮЧИТЬ КАМЕРУ";
+            btnCamera.innerText = cameraActive ? "[👁️] КАМERA АКТИВНА" : "[ ] ВКЛЮЧИТЬ КАМЕРУ";
             btnCamera.style.background = cameraActive ? "#004400" : "#002200";
             renderVisitor();
         }
@@ -535,45 +537,4 @@
                 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#ff0000; text-align:center;">
                     <div style="font-size:22px; font-weight:bold;" class="blinking">!!! ОБНАРУЖЕН БИОЛОГИЧЕСКИЙ ОБЪЕКТ «CRYPTOCOCCUS» !!!</div>
                     <br>
-                    <div style="border: 2px solid #ff0000; padding: 15px; background: #000; color: #ff0000; font-weight: bold;">
-                        [ ВНЕЗАПНЫЙ СБОЙ СИСТЕМЫ ПЕРИМЕТРА ]<br>
-                        СУЩЕСТВО ПРОРВАЛО ГЕРМОЗАТВОР
-                    </div>
-                </div>`;
-
-            setTimeout(() => {
-                clearInterval(sirenInterval);
-                monitorContent.classList.remove('screamer-glitch');
-                triggerGameOver(message);
-            }, 2500);
-        }
-
-        function checkWinCondition() {
-            if (gameMode === 'classic' && score >= 50) {
-                gameOver = true;
-                monitorContent.innerHTML = `
-                    <div style="color:#55ff55; text-align:center; padding-top:60px;">
-                        <h2>=== ПОБЕДА ===</h2>
-                        <p>Вы успешно отработали смену и спасли сектор ОКП-4.</p>
-                        <button class="btn" onclick="location.reload()">В ГЛАВНОЕ МЕНЮ</button>
-                    </div>`;
-            } else {
-                updateHUD();
-                nextVisitor();
-            }
-        }
-
-        function triggerGameOver(message) {
-            gameOver = true;
-            setButtonsDisabled(true);
-            monitorContent.innerHTML = `
-                <div style="color:#ff3333; text-align:center; padding-top:40px;">
-                    <h2>🔴 СЕКТОР ПОТЕРЯН 🔴</h2>
-                    <p style="font-size: 14px; line-height: 1.5; padding: 0 10px;">${message}</p>
-                    <p style="margin-top: 30px;"><b>Ваш результат: ${score}</b></p>
-                    <button class="btn" style="border-color:#ff3333;" onclick="location.reload()">ПОПРОБОВАТЬ СНОВА</button>
-                </div>`;
-        }
-    </script>
-</body>
-</html>
+                    <div style="border: 2px solid
