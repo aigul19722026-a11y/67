@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ОКП: Отдел Контроля Подражателей - NO TIMER EDITION</title>
+    <title>ОКП: Отдел Контроля Подражателей - FIX EDITION</title>
     <style>
         body {
             background-color: #020202;
@@ -69,6 +69,7 @@
         #ui-box {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             color: #88fa88;
             font-size: 13px;
             margin-bottom: 15px;
@@ -76,16 +77,28 @@
             padding-bottom: 5px;
         }
 
+        #btn-pause {
+            background: none;
+            border: 1px solid #00aa00;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        #btn-pause:hover {
+            background-color: #003300;
+        }
+
         #monitor {
             background-color: #020402;
             border: 2px solid #00aa00;
             padding: 15px;
-            min-height: 270px;
+            min-height: 290px;
             text-align: left;
             margin: 15px 0;
             border-radius: 10px;
             box-shadow: inset 0 0 20px #000;
-            transition: background-color 0.1s ease, opacity 0.05s ease;
         }
 
         .stat-line {
@@ -132,6 +145,12 @@
 
         button.game-btn:active {
             transform: scale(0.92);
+        }
+
+        button:disabled {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
         }
 
         #btn-allow { 
@@ -181,8 +200,8 @@
         }
 
         @keyframes hard-shake {
-            0% { transform: translate(25px, -20px) scale(1.4); filter: invert(0); }
-            50% { transform: translate(-25px, 20px) scale(1.2) invert(1); }
+            0% { transform: translate(25px, -20px) scale(1.4); }
+            50% { transform: translate(-25px, 20px) scale(1.2); }
             100% { transform: translate(15px, 15px) scale(1.5); }
         }
 
@@ -226,12 +245,16 @@
         
         <div id="ui-box">
             <div>ОБРАБОТАНО: <span id="score" style="color:#00ff00; font-weight:bold;">0</span></div>
+            <button id="btn-pause" onclick="togglePause()" style="display:none;">[ПАУЗА]</button>
             <div>ЯДРО СЕКТОРА: <span id="lives">★★★</span></div>
         </div>
         
         <div id="monitor">
-            <div id="monitor-content" onclick="startGame()" style="text-align: center; padding-top: 75px; font-size: 14px; color: #ff3333; cursor:pointer; font-weight:bold; letter-spacing: 1px; line-height: 1.6;">
-                [ КЛИКНИТЕ ПО ЭКРАНУ ДЛЯ СИНХРОНИЗАЦИИ ЗВУКА И ЗАПУСКА ТЕРМИНАЛА ]
+            <div id="monitor-content">
+                <div id="start-trigger" onclick="startGame()" style="text-align: center; padding-top: 85px; font-size: 13px; color: #ff3333; cursor:pointer; font-weight:bold; letter-spacing: 1px; line-height: 1.6;">
+                    [ КЛИКНИТЕ ЗДЕСЬ ДЛЯ ЗАПУСКА ТЕРМИНАЛА ]<br>
+                    <span style="color:#666; font-size:11px;">(активирует звуковые подсистемы)</span>
+                </div>
             </div>
         </div>
 
@@ -244,10 +267,13 @@
 </div>
 
 <script>
+// БАЗА ДАННЫХ ОБЪЕКТОВ С НОВЫМИ ПРИЗНАКАМИ
 const humans = [
-    { name: "Алексей П.", eyes: "Обычные", pulse: "74 уд/мин", mouthDraw: "[|||||||||]\nЗубы ровные, десны чистые", anomaly: "Гражданин вернулся со смены в блоке гидро-очистки." },
-    { name: "Елена К.", eyes: "Ясные", pulse: "81 уд/мин", mouthDraw: "[|||||||||]\nСледов деформаций челюсти нет", anomaly: "Жалуется на едкий запах гари на внешнем периметре." },
-    { name: "Сергей Д.", eyes: "Уставшие", pulse: "68 уд/мин", mouthDraw: "[|||||||||]\nЗубной ряд без изменений", anomaly: "Инженер вентиляционного хаба. Документы в порядке." }
+    { name: "Алексей П.", eyes: "Обычные, сонные", pulse: "74 уд/мин", mouthDraw: "[|||||||||]\nЗубы ровные, десны чистые", anomaly: "Гражданин вернулся со смены в блоке гидро-очистки." },
+    { name: "Елена К.", eyes: "Ясные, карие", pulse: "81 уд/мин", mouthDraw: "[|||||||||]\nСледов деформаций челюсти нет", anomaly: "Жалуется на едкий запах гари на внешнем периметре." },
+    { name: "Сергей Д.", eyes: "Уставшие, покрасневшие", pulse: "68 уд/мин", mouthDraw: "[|||||||||]\nЗубной ряд без изменений", anomaly: "Инженер вентиляционного хаба. Очки запотели от сырости." },
+    { name: "Мария О.", eyes: "Нормальные", pulse: "79 уд/мин", mouthDraw: "[|||||||||]\nПрисутствуют старые пломбы", anomaly: "Несла контейнер с пайком. На одежде следы обычной машинной смазки." },
+    { name: "Игорь Т.", eyes: "Впалые (недосып)", pulse: "85 уд/мин", mouthDraw: "[|||||||||]\nОбычная человеческая анатомия", anomaly: "Старший смены энергоблока. Руки дрожат от переутомления." }
 ];
 
 const monsters = [
@@ -277,6 +303,24 @@ const monsters = [
         anomaly: "ПРИЗНАК: Сканер зафиксировал скрытое гниение мягких тканей нёба.", 
         isMonster: true, 
         scaryMsg: "Зараженная тварь разорвала шлюз. Сектор аннигилирован." 
+    },
+    { 
+        name: "Ольга К. (?)", 
+        eyes: "⚠️ ДВА ЗРАЧКА В ОДНОМ ГЛАЗУ", 
+        pulse: "0 уд/мин (ОТКАЗ СДАТЧИКА)", 
+        mouthDraw: "[|||||||||]\nЗубы имитируют норму", 
+        anomaly: "ПРИЗНАК: Датчик пульса показывает ноль, но объект утверждает, что «просто замерз».", 
+        isMonster: true, 
+        scaryMsg: "Существо с поликорией притворилось человеком. Ночью оно вскрыло жилой отсек." 
+    },
+    { 
+        name: "Неизвестный рабочий", 
+        eyes: "Желтушные", 
+        pulse: "140 уд/мин", 
+        mouthDraw: "[|###|###|]\n⚠️ ВНИМАНИЕ: ЖЕЛЕЗНЫЕ ШТИФТЫ ВЖИВЛЕНЫ ПРЯМО В КОСТЬ", 
+        anomaly: "ПРИЗНАК: Из-под воротника куртки видны серые хитиновые пластины вместо кожи.", 
+        isMonster: true, 
+        scaryMsg: "Гибрид прорвался через охрану. Металлическая челюсть пробила вашу перегородку." 
     }
 ];
 
@@ -284,7 +328,8 @@ let score = 0;
 let lives = 3;
 let currentVisitor = null;
 let gameOver = false;
-let audioStarted = false;
+let gameStarted = false;
+let isPaused = false;
 let isProcessing = false;
 
 let audioCtx = null;
@@ -292,10 +337,9 @@ let osc1 = null, osc2 = null;
 let ambientGain = null;
 
 function initAudioEngine() {
-    if (audioStarted) return;
+    if (audioCtx) return;
     try {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
         osc1 = audioCtx.createOscillator();
         osc2 = audioCtx.createOscillator();
         ambientGain = audioCtx.createGain();
@@ -318,13 +362,11 @@ function initAudioEngine() {
         
         osc1.start();
         osc2.start();
-        
-        audioStarted = true;
     } catch(e) { console.log(e); }
 }
 
 function playAllowSound() {
-    if (!audioCtx) return;
+    if (!audioCtx || isPaused) return;
     let osc = audioCtx.createOscillator();
     let gain = audioCtx.createGain();
     osc.type = 'sine';
@@ -339,7 +381,7 @@ function playAllowSound() {
 }
 
 function playShotgunShot() {
-    if (!audioCtx) return;
+    if (!audioCtx || isPaused) return;
     let bufferSize = audioCtx.sampleRate * 0.7;
     let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
     let data = buffer.getChannelData(0);
@@ -401,14 +443,36 @@ const livesText = document.getElementById('lives');
 const btnAllow = document.getElementById('btn-allow');
 const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
+const btnPause = document.getElementById('btn-pause');
 const overlay = document.getElementById('screamer-overlay');
 
 btnAllow.style.display = "none";
 btnAlarm.style.display = "none";
 
 function startGame() {
+    gameStarted = true;
     initAudioEngine();
+    btnPause.style.display = "inline-block";
     nextVisitor();
+}
+
+function togglePause() {
+    if (gameOver || !gameStarted || isProcessing) return;
+    
+    isPaused = !isPaused;
+    if (isPaused) {
+        if (ambientGain) ambientGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        btnAllow.disabled = true;
+        btnAlarm.disabled = true;
+        btnPause.innerText = "[ПРОДОЛЖИТЬ]";
+        monitor.style.opacity = "0.4";
+    } else {
+        if (ambientGain) ambientGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        btnAllow.disabled = false;
+        btnAlarm.disabled = false;
+        btnPause.innerText = "[ПАУЗА]";
+        monitor.style.opacity = "1";
+    }
 }
 
 function nextVisitor() {
@@ -429,9 +493,11 @@ function nextVisitor() {
     
     btnAllow.style.display = "inline-block";
     btnAlarm.style.display = "inline-block";
+    btnAllow.disabled = false;
+    btnAlarm.disabled = false;
     btnNext.style.display = "none";
 
-    let monsterChance = Math.min(0.85, 0.35 + (score * 0.08));
+    let monsterChance = Math.min(0.85, 0.30 + (score * 0.07));
     if (Math.random() < monsterChance) {
         currentVisitor = monsters[Math.floor(Math.random() * monsters.length)];
     } else {
@@ -459,7 +525,6 @@ function renderVisitor() {
 
 function executeScreamer(msg) {
     gameOver = true;
-    
     if (ambientGain) ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
     btnAllow.style.display = "none";
     btnAlarm.style.display = "none";
@@ -473,6 +538,7 @@ function executeScreamer(msg) {
         overlay.style.display = "none";
         
         monitor.style.backgroundColor = "#2a0000";
+        monitor.style.opacity = "1";
         monitorContent.innerHTML = `
             <div class="stat-line" style="color: #ff0000; font-size: 16px; font-weight: bold; text-align:center;">🔴 БУНКЕР АННИГИЛИРОВАН 🔴</div><br>
             <div class="stat-line" style="color: #ffcc00; background: #000; padding: 10px; border: 1px solid #ff0000; font-size:12px;"><b>РЕЗУЛЬТАТ:</b><br>${msg}</div>
@@ -483,7 +549,7 @@ function executeScreamer(msg) {
 }
 
 function allowEntry() {
-    if (gameOver || isProcessing) return;
+    if (gameOver || isProcessing || isPaused) return;
     isProcessing = true;
     
     playAllowSound();
@@ -494,6 +560,7 @@ function allowEntry() {
     let count = 0;
     
     let animInterval = setInterval(() => {
+        if(isPaused) return; // задерживать анимацию на паузе
         count++;
         progress += "■";
         monitorContent.innerHTML = `
@@ -532,7 +599,7 @@ function allowEntry() {
 }
 
 function triggerAlarm() {
-    if (gameOver || isProcessing) return;
+    if (gameOver || isProcessing || isPaused) return;
     isProcessing = true;
     
     monitor.style.backgroundColor = "#1a0000";
