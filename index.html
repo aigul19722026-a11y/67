@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ОКП: Отдел Контроля Подражателей - ANIMATION UPDATE</title>
+    <title>ОКП: Отдел Контроля Подражателей - NO TIMER EDITION</title>
     <style>
         body {
             background-color: #020202;
@@ -71,24 +71,9 @@
             justify-content: space-between;
             color: #88fa88;
             font-size: 13px;
-            margin-bottom: 10px;
-        }
-
-        #timer-container {
-            width: 100%;
-            height: 6px;
-            background-color: #051105;
             margin-bottom: 15px;
-            border-radius: 2px;
-            overflow: hidden;
-            border: 1px solid #004400;
-        }
-
-        #timer-bar {
-            width: 100%;
-            height: 100%;
-            background-color: #00ff00;
-            box-shadow: 0 0 8px #00ff00;
+            border-bottom: 1px dashed #004400;
+            padding-bottom: 5px;
         }
 
         #monitor {
@@ -167,7 +152,7 @@
             color: #fff;
         }
 
-        /* ПОЛНОЭКРАННЫЙ СКРИМЕР — МОРДА ВАСИЛИЯ */
+        /* СКРИМЕР */
         #screamer-overlay {
             display: none;
             position: fixed;
@@ -243,10 +228,6 @@
             <div>ОБРАБОТАНО: <span id="score" style="color:#00ff00; font-weight:bold;">0</span></div>
             <div>ЯДРО СЕКТОРА: <span id="lives">★★★</span></div>
         </div>
-
-        <div id="timer-container">
-            <div id="timer-bar"></div>
-        </div>
         
         <div id="monitor">
             <div id="monitor-content" onclick="startGame()" style="text-align: center; padding-top: 75px; font-size: 14px; color: #ff3333; cursor:pointer; font-weight:bold; letter-spacing: 1px; line-height: 1.6;">
@@ -263,14 +244,12 @@
 </div>
 
 <script>
-// Мирные жители: зубы всегда идеальные
 const humans = [
     { name: "Алексей П.", eyes: "Обычные", pulse: "74 уд/мин", mouthDraw: "[|||||||||]\nЗубы ровные, десны чистые", anomaly: "Гражданин вернулся со смены в блоке гидро-очистки." },
     { name: "Елена К.", eyes: "Ясные", pulse: "81 уд/мин", mouthDraw: "[|||||||||]\nСледов деформаций челюсти нет", anomaly: "Жалуется на едкий запах гари на внешнем периметре." },
     { name: "Сергей Д.", eyes: "Уставшие", pulse: "68 уд/мин", mouthDraw: "[|||||||||]\nЗубной ряд без изменений", anomaly: "Инженер вентиляционного хаба. Документы в порядке." }
 ];
 
-// Твари: теперь признаки рта КРАЙНЕ разнообразны
 const monsters = [
     { 
         name: "Василий из 3-Б (Подражатель)", 
@@ -285,7 +264,7 @@ const monsters = [
         name: "Николай В.", 
         eyes: "Затуманенные", 
         pulse: "115 уд/мин", 
-        mouthDraw: "[vvvvvvvvv]\n⚠️ ВНИМАНИЕ: СТРУКТУРА ЗУБОВ ПРИНЯЛА ИГОЛЬЧАТУЮ ФОРМУ", // КРОВИ НЕТ, НО ЗУБЫ ОСТРЫЕ
+        mouthDraw: "[vvvvvvvvv]\n⚠️ ВНИМАНИЕ: СТРУКТУРА ЗУБОВ ПРИНЯЛА ИГОЛЬЧАТУЮ ФОРМУ", 
         anomaly: "ПРИЗНАК: Края челюсти пилообразные. Объект неестественно сглатывает слюну.", 
         isMonster: true, 
         scaryMsg: "Николай прокусил кабели питания. Терминал заблокирован изнутри тварью." 
@@ -294,7 +273,7 @@ const monsters = [
         name: "Анна С.", 
         eyes: "Бегающие", 
         pulse: "45 уд/мин", 
-        mouthDraw: "[|🩸|🩸||🩸|]\n⚠️ ВНИМАНИЕ: ОБНАРУЖЕНЫ СЛЕДЫ ЧЕРНОЙ КРОВИ НА ДЁСНАХ", // Классический кровавый
+        mouthDraw: "[|🩸|🩸||🩸|]\n⚠️ ВНИМАНИЕ: ОБНАРУЖЕНЫ СЛЕДЫ ЧЕРНОЙ КРОВИ НА ДЁСНАХ", 
         anomaly: "ПРИЗНАК: Сканер зафиксировал скрытое гниение мягких тканей нёба.", 
         isMonster: true, 
         scaryMsg: "Зараженная тварь разорвала шлюз. Сектор аннигилирован." 
@@ -306,15 +285,11 @@ let lives = 3;
 let currentVisitor = null;
 let gameOver = false;
 let audioStarted = false;
-let isProcessing = false; // Блокировка кнопок во время анимации
+let isProcessing = false;
 
 let audioCtx = null;
 let osc1 = null, osc2 = null;
 let ambientGain = null;
-
-let timeLeft = 100;
-let timerInterval = null;
-let baseTime = 7000; 
 
 function initAudioEngine() {
     if (audioStarted) return;
@@ -423,44 +398,17 @@ const monitor = document.getElementById('monitor');
 const monitorContent = document.getElementById('monitor-content');
 const scoreText = document.getElementById('score');
 const livesText = document.getElementById('lives');
-const timerBar = document.getElementById('timer-bar');
 const btnAllow = document.getElementById('btn-allow');
 const btnAlarm = document.getElementById('btn-alarm');
 const btnNext = document.getElementById('btn-next');
 const overlay = document.getElementById('screamer-overlay');
 
-// Скрытие кнопок управления до старта
 btnAllow.style.display = "none";
 btnAlarm.style.display = "none";
 
 function startGame() {
     initAudioEngine();
     nextVisitor();
-}
-
-function startTimer() {
-    clearInterval(timerInterval);
-    timeLeft = 100;
-    timerBar.style.width = "100%";
-    timerBar.style.backgroundColor = "#00ff00";
-    
-    let currentLimit = Math.max(2000, baseTime - (score * 350)); 
-    let step = 100 / (currentLimit / 40);
-
-    timerInterval = setInterval(() => {
-        if (gameOver || isProcessing) return;
-        timeLeft -= step;
-        if (timeLeft < 0) timeLeft = 0;
-        timerBar.style.width = timeLeft + "%";
-
-        if(timeLeft < 50) timerBar.style.backgroundColor = "#ffaa00";
-        if(timeLeft < 25) timerBar.style.backgroundColor = "#ff0000";
-
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            executeScreamer("ВРЕМЯ ИСТЕКЛО! Защита периметра пробита.");
-        }
-    }, 40);
 }
 
 function nextVisitor() {
@@ -491,7 +439,6 @@ function nextVisitor() {
     }
 
     renderVisitor();
-    startTimer();
 }
 
 function renderVisitor() {
@@ -512,7 +459,6 @@ function renderVisitor() {
 
 function executeScreamer(msg) {
     gameOver = true;
-    clearInterval(timerInterval);
     
     if (ambientGain) ambientGain.gain.setValueAtTime(0, audioCtx.currentTime); 
     btnAllow.style.display = "none";
@@ -536,16 +482,12 @@ function executeScreamer(msg) {
     }, 1500);
 }
 
-// АНИМАЦИЯ НАЖАТИЯ НА ЗЕЛЕНУЮ КНОПКУ (ВПУСТИТЬ)
 function allowEntry() {
     if (gameOver || isProcessing) return;
     isProcessing = true;
-    clearInterval(timerInterval);
     
     playAllowSound();
     monitor.style.backgroundColor = "#001a00";
-    
-    // Пошаговая текстовая анимация на экране терминала
     monitorContent.innerHTML = `<br><br><div class="stat-line" style="color:#00ff00; text-align:center;">[ИНИЦИАЛИЗАЦИЯ ШЛЮЗА...]</div>`;
     
     let progress = "";
@@ -563,7 +505,6 @@ function allowEntry() {
         if (count >= 5) {
             clearInterval(animInterval);
             
-            // Финал анимации пропуска
             monitor.style.backgroundColor = "#004400";
             monitorContent.innerHTML = `
                 <br><br>
@@ -590,11 +531,9 @@ function allowEntry() {
     }, 150);
 }
 
-// АНИМАЦИЯ НАЖАТИЯ НА КРАСНУЮ КНОПКУ (ЛИКВИДИРОВАТЬ)
 function triggerAlarm() {
     if (gameOver || isProcessing) return;
     isProcessing = true;
-    clearInterval(timerInterval);
     
     monitor.style.backgroundColor = "#1a0000";
     monitorContent.innerHTML = `
@@ -635,7 +574,7 @@ function triggerAlarm() {
                 }
             }
         }, 400);
-    }, 600); // Небольшая задержка перед выстрелом для нагнетания
+    }, 600); 
 }
 </script>
 
